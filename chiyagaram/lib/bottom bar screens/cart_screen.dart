@@ -1,4 +1,5 @@
-import 'dart:ui';
+import 'package:chiyagaram/screens/widget/background_scaffold.dart';
+import 'package:chiyagaram/theme/theme_provider.dart';
 import 'package:chiyagaram/screens/checkout_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -14,55 +15,45 @@ class CartScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    SizeConfig().init(context); // Ensure SizeConfig is initialized
-    return Scaffold(
+    SizeConfig().init(context);
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDark = themeProvider.isDarkMode;
+    final textColor = isDark ? Colors.white : const Color(0xFF3E2723);
+
+    return BackgroundScaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
+        leading: IconButton(
+          onPressed: () => Navigator.pop(context),
+          icon: Icon(Icons.arrow_back_ios, color: textColor),
+        ),
         title: Text(
           "My Order",
           style: GoogleFonts.philosopher(
             fontSize: 24.sp,
             fontWeight: FontWeight.bold,
-            color: const Color(0xFF3E2723),
+            color: textColor,
           ),
         ),
         centerTitle: true,
       ),
       body: Stack(
         children: [
-          // 1. Background Gradient
-          const RepaintBoundary(
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Color(0xFFFFF3E0),
-                    Color(0xFFFFECB3),
-                    Color(0xFFFBE9E7),
-                  ],
-                ),
-              ),
-              child: SizedBox.expand(),
-            ),
-          ),
-
-          // 2. Decorative Background Circles
+          // 1. Decorative Background Circles
           Positioned(
-            top: -50.w, // W-based
+            top: -50.w,
             right: -50.w,
             child: Container(
               width: 200.w,
               height: 200.w,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: const Color(0xFFFFCCBC).withValues(alpha: 0.4),
+                color: (isDark ? const Color(0xFF4E342E) : const Color(0xFFFFCCBC)).withValues(alpha: 0.4),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFFFFCCBC).withValues(alpha: 0.2),
+                    color: (isDark ? const Color(0xFF4E342E) : const Color(0xFFFFCCBC)).withValues(alpha: 0.2),
                     blurRadius: 50.w,
                     spreadRadius: 10.w,
                   ),
@@ -71,7 +62,7 @@ class CartScreen extends StatelessWidget {
             ),
           ),
 
-          // 3. Cart Content
+          // 2. Cart Content
           SafeArea(
             child: Consumer<CartModel>(
               builder: (context, cart, child) {
@@ -90,7 +81,7 @@ class CartScreen extends StatelessWidget {
                           "Your cart is empty",
                           style: GoogleFonts.outfit(
                             fontSize: 18.sp,
-                            color: const Color(0xFF8D6E63),
+                            color: isDark ? Colors.white70 : const Color(0xFF8D6E63),
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -119,7 +110,7 @@ class CartScreen extends StatelessWidget {
                               child: SlideAnimation(
                                 verticalOffset: 50.h,
                                 child: FadeInAnimation(
-                                  child: _buildCartItem(context, item, cart),
+                                  child: _buildCartItem(context, item, cart, isDark, textColor),
                                 ),
                               ),
                             );
@@ -129,8 +120,8 @@ class CartScreen extends StatelessWidget {
                     ),
                     // Total and Checkout
                     Padding(
-                      padding: EdgeInsets.only(bottom: 100.w), // Lifted up
-                      child: _buildCheckoutSection(context, cart),
+                      padding: EdgeInsets.only(bottom: 100.w),
+                      child: _buildCheckoutSection(context, cart, isDark, textColor),
                     ),
                   ],
                 );
@@ -142,39 +133,43 @@ class CartScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildCartItem(BuildContext context, CartItem item, CartModel cart) {
+  Widget _buildCartItem(BuildContext context, CartItem item, CartModel cart, bool isDark, Color textColor) {
     return Container(
-      margin: EdgeInsets.only(bottom: 8.w), // Ultra Reduced gap
-      // Removed fixed height: 130.h
+      margin: EdgeInsets.only(bottom: 8.w),
       child: Stack(
         clipBehavior: Clip.none,
         alignment: Alignment.centerLeft,
         children: [
           // Glassmorphic Card
           Container(
-            margin: EdgeInsets.only(left: 0), // Base container
+            margin: const EdgeInsets.only(left: 0),
             constraints: BoxConstraints(
               minHeight: 85.w,
-            ), // Ultra Reduced height
+            ),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(24.w),
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [
-                  item.color1.withValues(alpha: 0.15),
-                  item.color2.withValues(alpha: 0.05),
-                ],
+                colors: isDark 
+                  ? [
+                      Colors.white.withValues(alpha: 0.1),
+                      Colors.white.withValues(alpha: 0.05),
+                    ]
+                  : [
+                      item.color1.withValues(alpha: 0.15),
+                      item.color2.withValues(alpha: 0.05),
+                    ],
               ),
               border: Border.all(
-                color: Colors.white.withValues(alpha: 0.6),
+                color: isDark ? Colors.white10 : Colors.white.withValues(alpha: 0.6),
                 width: 1.5.w,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: item.color1.withValues(alpha: 0.1),
+                  color: isDark ? Colors.black26 : item.color1.withValues(alpha: 0.1),
                   blurRadius: 20.w,
-                  offset: Offset(0, 8.w), // W-based offset
+                  offset: Offset(0, 8.w),
                 ),
               ],
             ),
@@ -183,12 +178,10 @@ class CartScreen extends StatelessWidget {
               child: BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
                 child: Padding(
-                  // Reduced padding: left adjusted for smaller image
                   padding: EdgeInsets.fromLTRB(80.w, 10.w, 12.w, 10.w),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    // mainAxisAlignment: MainAxisAlignment.center, // Removed
-                    mainAxisSize: MainAxisSize.min, // Wrap content
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -198,9 +191,9 @@ class CartScreen extends StatelessWidget {
                             child: Text(
                               item.name,
                               style: GoogleFonts.philosopher(
-                                fontSize: 18.sp, // Slightly smaller
+                                fontSize: 18.sp,
                                 fontWeight: FontWeight.bold,
-                                color: const Color(0xFF3E2723),
+                                color: textColor,
                               ),
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
@@ -217,13 +210,13 @@ class CartScreen extends StatelessWidget {
                               child: Icon(
                                 Iconsax.trash,
                                 size: 20.sp,
-                                color: Colors.red[800],
+                                color: isDark ? Colors.redAccent : Colors.red[800],
                               ),
                             ),
                           ),
                         ],
                       ),
-                      SizedBox(height: 4.w), // Ultra Reduced spacing
+                      SizedBox(height: 4.w),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -233,8 +226,8 @@ class CartScreen extends StatelessWidget {
                               child: Text(
                                 "Rs. ${(double.parse(item.price.replaceAll(RegExp(r'[^0-9]'), '')) * item.quantity).toStringAsFixed(0)}",
                                 style: GoogleFonts.outfit(
-                                  fontSize: 15.sp, // Slightly smaller
-                                  color: const Color(0xFF3E2723),
+                                  fontSize: 15.sp,
+                                  color: textColor,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
@@ -244,13 +237,13 @@ class CartScreen extends StatelessWidget {
                           Container(
                             padding: EdgeInsets.symmetric(
                               horizontal: 6.w,
-                              vertical: 4.w, // W-based vertical padding
+                              vertical: 4.w,
                             ),
                             decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.5),
+                              color: isDark ? Colors.white10 : Colors.white.withValues(alpha: 0.5),
                               borderRadius: BorderRadius.circular(20.w),
                               border: Border.all(
-                                color: Colors.white.withValues(alpha: 0.8),
+                                color: isDark ? Colors.white10 : Colors.white.withValues(alpha: 0.8),
                               ),
                             ),
                             child: Row(
@@ -259,19 +252,20 @@ class CartScreen extends StatelessWidget {
                                 _buildQtyBtn(
                                   icon: Icons.remove,
                                   onTap: () => cart.removeSingleItem(item.id),
-                                  itemColor: item.color1,
-                                  size: 24.w, // Smaller
+                                  itemColor: isDark ? Colors.white : item.color1,
+                                  size: 24.w,
+                                  isDark: isDark,
                                 ),
-                                SizedBox(width: 8.w), // Tighter gap
+                                SizedBox(width: 8.w),
                                 Text(
                                   item.quantity.toString(),
                                   style: GoogleFonts.outfit(
-                                    fontSize: 15.sp, // Smaller
+                                    fontSize: 15.sp,
                                     fontWeight: FontWeight.bold,
-                                    color: const Color(0xFF3E2723),
+                                    color: textColor,
                                   ),
                                 ),
-                                SizedBox(width: 8.w), // Tighter gap
+                                SizedBox(width: 8.w),
                                 _buildQtyBtn(
                                   icon: Icons.add,
                                   onTap: () => cart.addItem(
@@ -284,8 +278,9 @@ class CartScreen extends StatelessWidget {
                                     color2: item.color2,
                                   ),
                                   isAdd: true,
-                                  itemColor: item.color1,
-                                  size: 24.w, // Smaller
+                                  itemColor: isDark ? Colors.white : item.color1,
+                                  size: 24.w,
+                                  isDark: isDark,
                                 ),
                               ],
                             ),
@@ -299,13 +294,11 @@ class CartScreen extends StatelessWidget {
             ),
           ),
 
-          // Floating Image - Further Reduced
+          // Floating Image
           Positioned(
             left: 10.w,
-            // bottom: 20.h, // Can't use fixed bottom if card height varies easily?
-            // Actually, if we use Stack alignment, we can align it to the left center.
             child: Container(
-              width: 60.w, // Smaller image
+              width: 60.w,
               height: 60.w,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
@@ -313,7 +306,7 @@ class CartScreen extends StatelessWidget {
                   BoxShadow(
                     color: item.color1.withValues(alpha: 0.4),
                     blurRadius: 15.w,
-                    offset: Offset(0, 8.w), // W-based
+                    offset: Offset(0, 8.w),
                   ),
                 ],
               ),
@@ -322,7 +315,7 @@ class CartScreen extends StatelessWidget {
                   item.imagePath,
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) =>
-                      Icon(Icons.fastfood, size: 30.sp),
+                      Icon(Icons.fastfood, size: 30.sp, color: textColor),
                 ),
               ),
             ),
@@ -338,6 +331,7 @@ class CartScreen extends StatelessWidget {
     bool isAdd = false,
     required Color itemColor,
     double? size,
+    required bool isDark,
   }) {
     final btnSize = size ?? 28.w;
     return GestureDetector(
@@ -346,26 +340,30 @@ class CartScreen extends StatelessWidget {
         width: btnSize,
         height: btnSize,
         decoration: BoxDecoration(
-          color: isAdd ? itemColor : Colors.white,
+          color: isAdd ? (isDark ? Colors.white : itemColor) : (isDark ? Colors.transparent : Colors.white),
           shape: BoxShape.circle,
+          border: isDark && !isAdd ? Border.all(color: Colors.white24) : null,
           boxShadow: [
-            BoxShadow(
-              color: itemColor.withValues(alpha: 0.2),
-              blurRadius: 4.w,
-              offset: Offset(0, 2.h),
-            ),
+            if (!isDark)
+              BoxShadow(
+                color: itemColor.withValues(alpha: 0.2),
+                blurRadius: 4.w,
+                offset: Offset(0, 2.h),
+              ),
           ],
         ),
         child: Icon(
           icon,
           size: (btnSize * 0.55),
-          color: isAdd ? Colors.white : itemColor,
+          color: isAdd 
+              ? (isDark ? Colors.black : Colors.white) 
+              : (isDark ? Colors.white : itemColor),
         ),
       ),
     );
   }
 
-  Widget _buildCheckoutSection(BuildContext context, CartModel cart) {
+  Widget _buildCheckoutSection(BuildContext context, CartModel cart, bool isDark, Color textColor) {
     return ClipRRect(
       borderRadius: BorderRadius.only(
         topLeft: Radius.circular(35.w),
@@ -375,16 +373,16 @@ class CartScreen extends StatelessWidget {
         padding: EdgeInsets.symmetric(
           horizontal: 24.w,
           vertical: 12.h,
-        ), // Extra Reduced vertical padding
+        ),
         decoration: BoxDecoration(
-          color: const Color(0xFFFFF3E0), // Solid Creamy Background
+          color: isDark ? const Color(0xFF2D1B18) : const Color(0xFFFFF3E0),
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(35.w),
             topRight: Radius.circular(35.w),
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
+              color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.05),
               blurRadius: 20.w,
               offset: Offset(0, -5.h),
             ),
@@ -396,16 +394,16 @@ class CartScreen extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               // Cost Breakdown
-              _buildSummaryRow("Sub total", cart.subTotal),
-              SizedBox(height: 6.h), // Extra Tighter spacing
-              _buildSummaryRow("Serving Fee", cart.servingFee),
-              SizedBox(height: 8.h), // Extra Tighter spacing
+              _buildSummaryRow("Sub total", cart.subTotal, isDark, textColor),
+              SizedBox(height: 6.h),
+              _buildSummaryRow("Serving Fee", cart.servingFee, isDark, textColor),
+              SizedBox(height: 8.h),
               // Divider
               Divider(
-                color: const Color(0xFF5D4037).withValues(alpha: 0.2),
+                color: (isDark ? Colors.white : const Color(0xFF5D4037)).withValues(alpha: 0.2),
                 thickness: 1,
               ),
-              SizedBox(height: 8.h), // Extra Tighter spacing
+              SizedBox(height: 8.h),
               // Grand Total
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -415,7 +413,7 @@ class CartScreen extends StatelessWidget {
                     style: GoogleFonts.philosopher(
                       fontSize: 22.sp,
                       fontWeight: FontWeight.bold,
-                      color: const Color(0xFF3E2723),
+                      color: textColor,
                     ),
                   ),
                   Text(
@@ -423,20 +421,19 @@ class CartScreen extends StatelessWidget {
                     style: GoogleFonts.philosopher(
                       fontSize: 26.sp,
                       fontWeight: FontWeight.bold,
-                      color: const Color(0xFF3E2723),
+                      color: textColor,
                     ),
                   ),
                 ],
               ),
-              SizedBox(height: 12.h), // Extra Tighter spacing
-              // Checkout Button
+              SizedBox(height: 12.h),
               // Checkout Button
               Container(
                 width: double.infinity,
-                height: 45.w, // Increased height
+                height: 45.w,
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(30.w), // Pill shape
-                  color: const Color(0xFF1A1A1A), // Almost black/dark brown
+                  borderRadius: BorderRadius.circular(30.w),
+                  color: isDark ? Colors.white : const Color(0xFF1A1A1A),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withValues(alpha: 0.2),
@@ -463,7 +460,7 @@ class CartScreen extends StatelessWidget {
                         style: GoogleFonts.outfit(
                           fontSize: 18.sp,
                           fontWeight: FontWeight.w600,
-                          color: Colors.white,
+                          color: isDark ? Colors.black : Colors.white,
                           letterSpacing: 0.5,
                         ),
                       ),
@@ -478,7 +475,7 @@ class CartScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSummaryRow(String label, double amount) {
+  Widget _buildSummaryRow(String label, double amount, bool isDark, Color textColor) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -486,7 +483,7 @@ class CartScreen extends StatelessWidget {
           label,
           style: GoogleFonts.outfit(
             fontSize: 15.sp,
-            color: const Color(0xFF5D4037).withValues(alpha: 0.8),
+            color: isDark ? Colors.white70 : const Color(0xFF5D4037).withValues(alpha: 0.8),
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -494,7 +491,7 @@ class CartScreen extends StatelessWidget {
           "Rs. ${amount.toStringAsFixed(0)}",
           style: GoogleFonts.outfit(
             fontSize: 15.sp,
-            color: const Color(0xFF3E2723),
+            color: textColor,
             fontWeight: FontWeight.w600,
           ),
         ),

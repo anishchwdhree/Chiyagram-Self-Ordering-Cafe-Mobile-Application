@@ -2,8 +2,11 @@ import 'package:chiyagaram/responsive/size_config.dart';
 import 'package:chiyagaram/menu/specialties%20screens/hookah_screen.dart';
 import 'package:chiyagaram/menu/specialties%20screens/snacks_screen.dart';
 import 'package:chiyagaram/menu/specialties%20screens/traditional_chiya_screen.dart';
+import 'package:chiyagaram/screens/widget/background_scaffold.dart';
+import 'package:chiyagaram/theme/theme_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
 class MenuScreen extends StatefulWidget {
   const MenuScreen({super.key});
@@ -15,35 +18,26 @@ class MenuScreen extends StatefulWidget {
 class _MenuScreenState extends State<MenuScreen> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDark = themeProvider.isDarkMode;
+    final textColor = isDark ? Colors.white : const Color(0xFF3E2723);
+    final subTextColor = isDark ? Colors.white70 : const Color(0xFF5D4037);
+
+    return BackgroundScaffold(
       body: Stack(
         children: [
-          // 1. Background Gradient
-          const RepaintBoundary(
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Color(0xFFFFF3E0),
-                    Color(0xFFFFECB3),
-                    Color(0xFFFBE9E7),
-                  ],
-                ),
-              ),
-              child: SizedBox.expand(),
-            ),
-          ),
-
-          // 2. Background Shapes (Subtle)
+          // 1. Background Shapes (Subtle)
           Positioned(
             top: -50.h,
             right: -50.w,
-            child: _buildBackgroundCircle(200.w, const Color(0xFFFFCCBC), 0.3),
+            child: _buildBackgroundCircle(
+              200.w,
+              isDark ? const Color(0xFF4E342E) : const Color(0xFFFFCCBC),
+              0.3,
+            ),
           ),
 
-          // 3. Content
+          // 2. Content
           SafeArea(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -56,7 +50,7 @@ class _MenuScreenState extends State<MenuScreen> {
                     style: GoogleFonts.philosopher(
                       fontSize: 28.sp,
                       fontWeight: FontWeight.bold,
-                      color: const Color(0xFF3E2723),
+                      color: textColor,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -74,7 +68,7 @@ class _MenuScreenState extends State<MenuScreen> {
                     style: GoogleFonts.philosopher(
                       fontSize: 16.sp,
                       fontWeight: FontWeight.w500,
-                      color: const Color(0xFF5D4037),
+                      color: subTextColor,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -89,7 +83,7 @@ class _MenuScreenState extends State<MenuScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         // Today's Special Banner
-                        _buildTodaysSpecialBanner(),
+                        _buildTodaysSpecialBanner(isDark, textColor, subTextColor),
 
                         SizedBox(height: 30.h),
 
@@ -104,12 +98,7 @@ class _MenuScreenState extends State<MenuScreen> {
                                   style: GoogleFonts.philosopher(
                                     fontSize: 24.sp,
                                     fontWeight: FontWeight.bold,
-                                    color: const Color.fromARGB(
-                                      255,
-                                      49,
-                                      31,
-                                      28,
-                                    ),
+                                    color: textColor,
                                   ),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
@@ -119,9 +108,7 @@ class _MenuScreenState extends State<MenuScreen> {
                               Expanded(
                                 child: Container(
                                   height: 1,
-                                  color: const Color(
-                                    0xFF8D6E63,
-                                  ).withValues(alpha: 0.3),
+                                  color: (isDark ? Colors.white : const Color(0xFF8D6E63)).withValues(alpha: 0.3),
                                 ),
                               ),
                             ],
@@ -139,11 +126,11 @@ class _MenuScreenState extends State<MenuScreen> {
                                 title: "Traditional Chiya",
                                 subtitle: "Experience the authentic taste",
                                 imagePath: "images/bm1.png",
+                                isDark: isDark,
                                 onTap: () => Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (_) =>
-                                        const TraditionalChiyaScreen(),
+                                    builder: (_) => const TraditionalChiyaScreen(),
                                   ),
                                 ),
                               ),
@@ -152,6 +139,7 @@ class _MenuScreenState extends State<MenuScreen> {
                                 title: "Snacks",
                                 subtitle: "Delicious bites for every moment",
                                 imagePath: "images/bm2.png",
+                                isDark: isDark,
                                 onTap: () => Navigator.push(
                                   context,
                                   MaterialPageRoute(
@@ -164,6 +152,7 @@ class _MenuScreenState extends State<MenuScreen> {
                                 title: "Hookah",
                                 subtitle: "Relax and unwind in style",
                                 imagePath: "images/bm3.png",
+                                isDark: isDark,
                                 onTap: () => Navigator.push(
                                   context,
                                   MaterialPageRoute(
@@ -186,7 +175,7 @@ class _MenuScreenState extends State<MenuScreen> {
     );
   }
 
-  Widget _buildTodaysSpecialBanner() {
+  Widget _buildTodaysSpecialBanner(bool isDark, Color textColor, Color subTextColor) {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 20.w),
       width: double.infinity,
@@ -194,22 +183,27 @@ class _MenuScreenState extends State<MenuScreen> {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(25.w),
         gradient: LinearGradient(
-          colors: [
-            const Color(0xFFF8BBD0).withValues(alpha: 0.9), // Pinkish
-            const Color(0xFFD7CCC8).withValues(alpha: 0.8), // Beigeish
-          ],
+          colors: isDark
+              ? [
+                  const Color(0xFF4E342E).withValues(alpha: 0.9),
+                  const Color(0xFF3E2723).withValues(alpha: 0.8),
+                ]
+              : [
+                  const Color(0xFFF8BBD0).withValues(alpha: 0.9),
+                  const Color(0xFFD7CCC8).withValues(alpha: 0.8),
+                ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF8D6E63).withValues(alpha: 0.2),
+            color: (isDark ? Colors.black : const Color(0xFF8D6E63)).withValues(alpha: 0.2),
             blurRadius: 15,
             offset: const Offset(0, 8),
           ),
         ],
         border: Border.all(
-          color: Colors.white.withValues(alpha: 0.4),
+          color: (isDark ? Colors.white12 : Colors.white.withValues(alpha: 0.4)),
           width: 1,
         ),
       ),
@@ -229,7 +223,7 @@ class _MenuScreenState extends State<MenuScreen> {
                     style: GoogleFonts.outfit(
                       fontSize: 12.sp,
                       fontWeight: FontWeight.w600,
-                      color: const Color(0xFF5D4037),
+                      color: isDark ? Colors.white70 : const Color(0xFF5D4037),
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -241,7 +235,7 @@ class _MenuScreenState extends State<MenuScreen> {
                       style: GoogleFonts.philosopher(
                         fontSize: 20.sp,
                         fontWeight: FontWeight.bold,
-                        color: const Color(0xFF3E2723),
+                        color: textColor,
                         height: 1.1,
                       ),
                       maxLines: 3,
@@ -255,7 +249,7 @@ class _MenuScreenState extends State<MenuScreen> {
                       vertical: 6.h,
                     ),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF3E2723),
+                      color: isDark ? Colors.white : const Color(0xFF3E2723),
                       borderRadius: BorderRadius.circular(20.w),
                     ),
                     child: Text(
@@ -263,7 +257,7 @@ class _MenuScreenState extends State<MenuScreen> {
                       style: GoogleFonts.outfit(
                         fontSize: 12.sp,
                         fontWeight: FontWeight.w600,
-                        color: Colors.white,
+                        color: isDark ? Colors.black : Colors.white,
                       ),
                     ),
                   ),
@@ -279,7 +273,7 @@ class _MenuScreenState extends State<MenuScreen> {
                   padding: EdgeInsets.all(5.w),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Colors.white.withValues(alpha: 0.4),
+                    color: isDark ? Colors.black12 : Colors.white.withValues(alpha: 0.4),
                   ),
                   child: ClipOval(
                     child: Image.asset(
@@ -287,11 +281,11 @@ class _MenuScreenState extends State<MenuScreen> {
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) {
                         return Container(
-                          color: const Color(0xFFFFE0B2),
+                          color: isDark ? const Color(0xFF4E342E) : const Color(0xFFFFE0B2),
                           child: Icon(
                             Icons.local_cafe,
                             size: 40.sp,
-                            color: const Color(0xFF8D6E63),
+                            color: isDark ? Colors.white38 : const Color(0xFF8D6E63),
                           ),
                         );
                       },
@@ -311,6 +305,7 @@ class _MenuScreenState extends State<MenuScreen> {
     required String subtitle,
     required String imagePath,
     required VoidCallback onTap,
+    required bool isDark,
   }) {
     return GestureDetector(
       onTap: onTap,
@@ -337,11 +332,11 @@ class _MenuScreenState extends State<MenuScreen> {
                 child: Image.asset(
                   imagePath,
                   fit: BoxFit.cover,
-                  color: Colors.black.withValues(alpha: 0.2),
+                  color: Colors.black.withValues(alpha: isDark ? 0.4 : 0.2),
                   colorBlendMode: BlendMode.darken,
                   errorBuilder: (context, error, stackTrace) {
                     return Container(
-                      color: const Color(0xFF3E2723),
+                      color: isDark ? const Color(0xFF2D1B18) : const Color(0xFF3E2723),
                       child: Icon(
                         Icons.image,
                         size: 40.sp,

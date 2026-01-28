@@ -1,3 +1,6 @@
+import 'package:chiyagaram/screens/widget/background_scaffold.dart';
+import 'package:chiyagaram/theme/theme_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:chiyagaram/animations/fade_animation.dart';
 import 'package:chiyagaram/responsive/size_config.dart';
 import 'package:chiyagaram/screens/auth/login_screen.dart';
@@ -65,14 +68,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
-    SystemChrome.setSystemUIOverlayStyle(
-      const SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent,
-        statusBarIconBrightness: Brightness.dark,
-      ),
-    );
-    return Scaffold(
-      backgroundColor: Colors.white,
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDark = themeProvider.isDarkMode;
+    final textColor = isDark ? Colors.white : Colors.black87;
+    final subTextColor = isDark ? Colors.white70 : Colors.grey[600];
+
+    return BackgroundScaffold(
       body: Column(
         children: [
           Expanded(
@@ -94,8 +95,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         delay: 0.1,
                         child: Container(
                           padding: EdgeInsets.all(20.w),
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
+                          decoration: BoxDecoration(
+                            color: isDark ? Colors.white10 : Colors.white,
                             shape: BoxShape.circle,
                           ),
                           child: _contents[index].image != null
@@ -103,7 +104,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
                                     border: Border.all(
-                                      color: Colors.white,
+                                      color: isDark ? Colors.white24 : Colors.white,
                                       width: 4.w,
                                     ),
                                   ),
@@ -134,7 +135,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           style: GoogleFonts.outfit(
                             fontSize: 24.sp,
                             fontWeight: FontWeight.bold,
-                            color: Colors.black87,
+                            color: textColor,
                           ),
                         ),
                       ),
@@ -147,7 +148,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           textAlign: TextAlign.center,
                           style: GoogleFonts.inter(
                             fontSize: 14.sp,
-                            color: Colors.grey[600],
+                            color: subTextColor,
                             height: 1.5,
                           ),
                         ),
@@ -167,7 +168,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 Row(
                   children: List.generate(
                     _contents.length,
-                    (index) => buildDot(index),
+                    (index) => buildDot(index, isDark),
                   ),
                 ),
                 // Button
@@ -214,7 +215,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
-  AnimatedContainer buildDot(int index) {
+  AnimatedContainer buildDot(int index, bool isDark) {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
       margin: EdgeInsets.only(right: 8.w),
@@ -223,7 +224,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       decoration: BoxDecoration(
         color: _currentPage == index
             ? _contents[index].color
-            : Colors.grey[300],
+            : (isDark ? Colors.white24 : Colors.grey[300]),
         borderRadius: BorderRadius.circular(4),
       ),
     );

@@ -1,4 +1,4 @@
-import 'package:chiyagaram/profile/profile_screen.dart';
+import 'package:chiyagaram/screens/widget/background_scaffold.dart';
 import 'package:chiyagaram/theme/app_colors.dart';
 import 'package:chiyagaram/theme/theme_provider.dart';
 import 'package:flutter/material.dart';
@@ -53,7 +53,7 @@ class _SecondHomescreenState extends State<SecondHomescreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return BackgroundScaffold(
       body: Stack(
         children: [
           // PageView for Swipe Navigation
@@ -102,31 +102,7 @@ class _HomeTabState extends State<HomeTab> {
 
     return Stack(
       children: [
-        // 1. Background Gradient
-        RepaintBoundary(
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: isDark
-                    ? [
-                        AppColors.darkBgStart,
-                        AppColors.darkBgMiddle,
-                        AppColors.darkBgEnd,
-                      ]
-                    : [
-                        AppColors.backgroundGradientStart,
-                        AppColors.backgroundGradientMiddle,
-                        AppColors.backgroundGradientEnd,
-                      ],
-              ),
-            ),
-            child: const SizedBox.expand(),
-          ),
-        ),
-
-        // 2. Background Shapes
+        // 1. Background Shapes
         Stack(
           children: [
             Positioned(

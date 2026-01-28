@@ -1,3 +1,6 @@
+import 'package:chiyagaram/screens/widget/background_scaffold.dart';
+import 'package:chiyagaram/theme/theme_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:chiyagaram/animations/fade_animation.dart';
 import 'package:chiyagaram/responsive/size_config.dart';
 import 'package:chiyagaram/screens/second_homescreen.dart';
@@ -27,73 +30,56 @@ class _SignupScreenState extends State<SignupScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      body: Stack(
-        children: [
-          // Background
-          Container(
-            height: double.infinity,
-            width: double.infinity,
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Color(0xFFFFF8E1), // Very light amber
-                  Color(0xFFFFECB3), // Amber 100
-                  Color(0xFFFFE0B2), // Orange 100
-                ],
-              ),
-            ),
-          ),
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDark = themeProvider.isDarkMode;
+    final textColor = isDark ? Colors.white : const Color(0xFF3E2723);
+    final subTextColor = isDark ? Colors.white70 : const Color(0xFF795548).withValues(alpha: 0.5);
 
-          SafeArea(
-            child: SizedBox(
-              height: MediaQuery.of(context).size.height,
-              width: MediaQuery.of(context).size.width,
-              child: Column(
-                children: [
-                  Expanded(
-                    child: SingleChildScrollView(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 24.w,
-                        vertical: 24.h,
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          IconButton(
-                            onPressed: () => Navigator.pop(context),
-                            icon: const Icon(Icons.arrow_back_ios),
-                            color: const Color(0xFF3E2723),
-                          ),
-                          SizedBox(height: 20.h),
-                          _buildHeader(),
-                          SizedBox(height: 40.h),
-                          _buildSignupForm(),
-                          SizedBox(height: 40.h),
-                          _buildSignupButton(),
-                          SizedBox(height: 30.h),
-                          _buildDivider(),
-                          SizedBox(height: 30.h),
-                          _buildSocialButtons(),
-                          SizedBox(height: 40.h),
-                          _buildLoginLink(),
-                        ],
-                      ),
-                    ),
+    return BackgroundScaffold(
+      resizeToAvoidBottomInset: false,
+      body: SafeArea(
+        child: SizedBox(
+          height: MediaQuery.of(context).size.height,
+          width: MediaQuery.of(context).size.width,
+          child: Column(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 24.w,
+                    vertical: 24.h,
                   ),
-                ],
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      IconButton(
+                        onPressed: () => Navigator.pop(context),
+                        icon: Icon(Icons.arrow_back_ios, color: textColor),
+                      ),
+                      SizedBox(height: 20.h),
+                      _buildHeader(textColor, subTextColor),
+                      SizedBox(height: 40.h),
+                      _buildSignupForm(isDark, textColor),
+                      SizedBox(height: 40.h),
+                      _buildSignupButton(isDark),
+                      SizedBox(height: 30.h),
+                      _buildDivider(isDark),
+                      SizedBox(height: 30.h),
+                      _buildSocialButtons(isDark),
+                      SizedBox(height: 40.h),
+                      _buildLoginLink(isDark),
+                    ],
+                  ),
+                ),
               ),
-            ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(Color textColor, Color subTextColor) {
     return FadeAnimation(
       delay: 0.2,
       child: Column(
@@ -103,7 +89,7 @@ class _SignupScreenState extends State<SignupScreen> {
             'Create Account',
             style: GoogleFonts.outfit(
               fontWeight: FontWeight.bold,
-              color: const Color(0xFF3E2723), // Dark Brown
+              color: textColor,
               fontSize: 32.sp,
             ),
           ),
@@ -111,9 +97,7 @@ class _SignupScreenState extends State<SignupScreen> {
           Text(
             'Start your journey with us today!',
             style: GoogleFonts.inter(
-              color: const Color(
-                0xFF795548,
-              ).withValues(alpha: 0.5), // Brown 300 with reduced opacity
+              color: subTextColor,
               fontSize: 16.sp,
               height: 1.0,
             ),
@@ -123,7 +107,7 @@ class _SignupScreenState extends State<SignupScreen> {
     );
   }
 
-  Widget _buildSignupForm() {
+  Widget _buildSignupForm(bool isDark, Color textColor) {
     return Column(
       children: [
         FadeAnimation(
@@ -133,6 +117,8 @@ class _SignupScreenState extends State<SignupScreen> {
             label: "Full Name",
             hint: "Enter your full name",
             icon: Icons.person_outline,
+            isDark: isDark,
+            textColor: textColor,
           ),
         ),
         SizedBox(height: 20.h),
@@ -143,6 +129,8 @@ class _SignupScreenState extends State<SignupScreen> {
             label: "Email",
             hint: "Enter your email",
             icon: Icons.email_outlined,
+            isDark: isDark,
+            textColor: textColor,
           ),
         ),
         SizedBox(height: 20.h),
@@ -154,13 +142,15 @@ class _SignupScreenState extends State<SignupScreen> {
             hint: "Create a password",
             isPassword: true,
             icon: Icons.lock_outline,
+            isDark: isDark,
+            textColor: textColor,
           ),
         ),
       ],
     );
   }
 
-  Widget _buildSignupButton() {
+  Widget _buildSignupButton(bool isDark) {
     return FadeAnimation(
       delay: 0.6,
       child: SizedBox(
@@ -171,7 +161,6 @@ class _SignupScreenState extends State<SignupScreen> {
             setState(() {
               _isLoading = true;
             });
-            // Simulate network delay
             Future.delayed(const Duration(seconds: 2), () {
               if (mounted) {
                 setState(() {
@@ -187,8 +176,8 @@ class _SignupScreenState extends State<SignupScreen> {
             });
           },
           style: ElevatedButton.styleFrom(
-            backgroundColor: const Color.fromARGB(255, 0, 0, 0),
-            foregroundColor: Colors.white,
+            backgroundColor: isDark ? Colors.white : const Color.fromARGB(255, 0, 0, 0),
+            foregroundColor: isDark ? Colors.black : Colors.white,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(30),
             ),
@@ -196,7 +185,7 @@ class _SignupScreenState extends State<SignupScreen> {
             shadowColor: const Color(0xFF5D4037).withValues(alpha: 0.5),
           ),
           child: _isLoading
-              ? const CircularProgressIndicator(color: Colors.white)
+              ? CircularProgressIndicator(color: isDark ? Colors.black : Colors.white)
               : Text(
                   'SIGN UP',
                   style: GoogleFonts.outfit(
@@ -210,41 +199,43 @@ class _SignupScreenState extends State<SignupScreen> {
     );
   }
 
-  Widget _buildDivider() {
+  Widget _buildDivider(bool isDark) {
     return FadeAnimation(
       delay: 0.7,
       child: Row(
         children: [
-          const Expanded(child: Divider(color: Colors.black12)),
+          Expanded(child: Divider(color: isDark ? Colors.white24 : Colors.black12)),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 16.w),
             child: Text(
               'Or sign up with',
-              style: GoogleFonts.inter(color: Colors.black38, fontSize: 13.sp),
+              style: GoogleFonts.inter(
+                color: isDark ? Colors.white54 : Colors.black38,
+                fontSize: 13.sp,
+              ),
             ),
           ),
-          const Expanded(child: Divider(color: Colors.black12)),
+          Expanded(child: Divider(color: isDark ? Colors.white24 : Colors.black12)),
         ],
       ),
     );
   }
 
-  Widget _buildSocialButtons() {
+  Widget _buildSocialButtons(bool isDark) {
     return FadeAnimation(
       delay: 0.8,
       child: Center(
         child: _SocialButton(
           imagePath: "images/Google.png",
           label: "Continue with Google",
-          onTap: () {
-            // Handle Google Signup
-          },
+          isDark: isDark,
+          onTap: () {},
         ),
       ),
     );
   }
 
-  Widget _buildLoginLink() {
+  Widget _buildLoginLink(bool isDark) {
     return FadeAnimation(
       delay: 0.9,
       child: Row(
@@ -252,7 +243,10 @@ class _SignupScreenState extends State<SignupScreen> {
         children: [
           Text(
             "Already have an account?",
-            style: GoogleFonts.inter(color: Colors.black54, fontSize: 14.sp),
+            style: GoogleFonts.inter(
+              color: isDark ? Colors.white54 : Colors.black54,
+              fontSize: 14.sp,
+            ),
           ),
           TextButton(
             onPressed: () {
@@ -261,7 +255,7 @@ class _SignupScreenState extends State<SignupScreen> {
             child: Text(
               "Login",
               style: GoogleFonts.inter(
-                color: const Color(0xFF5D4037),
+                color: isDark ? Colors.white : const Color(0xFF5D4037),
                 fontWeight: FontWeight.bold,
                 fontSize: 14.sp,
               ),
@@ -279,6 +273,8 @@ class _CustomTextField extends StatelessWidget {
   final bool isPassword;
   final IconData icon;
   final TextEditingController controller;
+  final bool isDark;
+  final Color textColor;
 
   const _CustomTextField({
     required this.label,
@@ -286,6 +282,8 @@ class _CustomTextField extends StatelessWidget {
     this.isPassword = false,
     required this.icon,
     required this.controller,
+    required this.isDark,
+    required this.textColor,
   });
 
   @override
@@ -298,30 +296,39 @@ class _CustomTextField extends StatelessWidget {
           style: GoogleFonts.outfit(
             fontSize: 14.sp,
             fontWeight: FontWeight.w600,
-            color: const Color(0xFF3E2723),
+            color: textColor,
           ),
         ),
         SizedBox(height: 8.h),
         Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: isDark ? Colors.white10 : Colors.white,
             borderRadius: BorderRadius.circular(30),
             boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              ),
+              if (!isDark)
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
             ],
           ),
           child: TextField(
             controller: controller,
             obscureText: isPassword,
-            style: GoogleFonts.inter(fontSize: 16.sp, color: Colors.black87),
+            style: GoogleFonts.inter(
+              fontSize: 16.sp,
+              color: isDark ? Colors.white : Colors.black87,
+            ),
             decoration: InputDecoration(
               hintText: hint,
-              hintStyle: GoogleFonts.inter(color: Colors.black38),
-              prefixIcon: Icon(icon, color: const Color(0xFF8D6E63)),
+              hintStyle: GoogleFonts.inter(
+                color: isDark ? Colors.white38 : Colors.black38,
+              ),
+              prefixIcon: Icon(
+                icon,
+                color: isDark ? Colors.white70 : const Color(0xFF8D6E63),
+              ),
               border: InputBorder.none,
               contentPadding: EdgeInsets.symmetric(
                 horizontal: 20.w,
@@ -340,12 +347,14 @@ class _SocialButton extends StatelessWidget {
   final String? imagePath;
   final String label;
   final VoidCallback onTap;
+  final bool isDark;
 
   const _SocialButton({
     this.icon,
     this.imagePath,
     required this.label,
     required this.onTap,
+    required this.isDark,
   }) : assert(icon != null || imagePath != null);
 
   @override
@@ -356,15 +365,18 @@ class _SocialButton extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 8.h),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: isDark ? Colors.white10 : Colors.white,
           borderRadius: BorderRadius.circular(30),
-          border: Border.all(color: Colors.black12),
+          border: Border.all(
+            color: isDark ? Colors.white24 : Colors.black12,
+          ),
           boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 5,
-              offset: const Offset(0, 2),
-            ),
+            if (!isDark)
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.05),
+                blurRadius: 5,
+                offset: const Offset(0, 2),
+              ),
           ],
         ),
         child: Row(
@@ -373,14 +385,18 @@ class _SocialButton extends StatelessWidget {
             if (imagePath != null)
               Image.asset(imagePath!, height: 24.h, width: 24.h)
             else
-              Icon(icon, size: 24.sp, color: const Color(0xFF5D4037)),
+              Icon(
+                icon,
+                size: 24.sp,
+                color: isDark ? Colors.white : const Color(0xFF5D4037),
+              ),
             SizedBox(width: 12.w),
             Text(
               label,
               style: GoogleFonts.inter(
                 fontSize: 15.sp,
                 fontWeight: FontWeight.w600,
-                color: Colors.black87,
+                color: isDark ? Colors.white : Colors.black87,
               ),
             ),
           ],

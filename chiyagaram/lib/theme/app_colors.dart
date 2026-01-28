@@ -19,6 +19,12 @@ class AppColors {
   static const Color darkBgMiddle = Color(0xFF3E2723);
   static const Color darkBgEnd = Color(0xFF1A1210);
 
+  static List<Color> getBackgroundGradient(bool isDark) {
+    return isDark
+        ? [darkBgStart, darkBgMiddle, darkBgEnd]
+        : [backgroundGradientStart, backgroundGradientMiddle, backgroundGradientEnd];
+  }
+
   // ========== BROWN PALETTE EXTENSIONS ==========
   static const Color deepBrown = Color(
     0xFF4E342E,

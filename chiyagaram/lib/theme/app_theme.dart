@@ -119,7 +119,7 @@ class AppTheme {
         onSurface: AppColors.white,
         onError: AppColors.white,
       ),
-      scaffoldBackgroundColor: AppColors.black,
+      scaffoldBackgroundColor: AppColors.darkBgMiddle,
 
       // Text Theme
       textTheme: GoogleFonts.outfitTextTheme().apply(

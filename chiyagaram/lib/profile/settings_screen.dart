@@ -1,3 +1,5 @@
+import 'package:chiyagaram/screens/widget/background_scaffold.dart';
+import 'package:chiyagaram/theme/app_colors.dart';
 import 'package:chiyagaram/theme/theme_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -31,63 +33,34 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ? const Color(0xFF5D4037).withOpacity(0.4)
         : Colors.white.withValues(alpha: 0.6);
 
-    return Scaffold(
-      body: Stack(
-        children: [
-          // Background Gradient
-          RepaintBoundary(
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: isDark
-                    ? const LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          Color(0xFF2D1B18),
-                          Color(0xFF3E2723),
-                          Color(0xFF1A1210),
-                        ],
-                      )
-                    : const LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          Color(0xFFFFF3E0),
-                          Color(0xFFFFECB3),
-                          Color(0xFFFBE9E7),
-                        ],
-                      ),
-              ),
-              child: const SizedBox.expand(),
-            ),
-          ),
-          SafeArea(
-            child: SingleChildScrollView(
-              padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+    return BackgroundScaffold(
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Custom App Bar
+              Row(
                 children: [
-                  // Custom App Bar
-                  Row(
-                    children: [
-                      IconButton(
-                        onPressed: () => Navigator.pop(context),
-                        icon: Icon(Icons.arrow_back_ios_new, color: textColor),
-                      ),
-                      Expanded(
-                        child: Text(
-                          "Settings",
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.philosopher(
-                            fontSize: 20.sp,
-                            fontWeight: FontWeight.bold,
-                            color: textColor,
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: 40.w), // Balance back button
-                    ],
+                  IconButton(
+                    onPressed: () => Navigator.pop(context),
+                    icon: Icon(Icons.arrow_back_ios_new, color: textColor),
                   ),
+                  Expanded(
+                    child: Text(
+                      "Settings",
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.philosopher(
+                        fontSize: 20.sp,
+                        fontWeight: FontWeight.bold,
+                        color: textColor,
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 40.w), // Balance back button
+                ],
+              ),
                   SizedBox(height: 20.h),
 
                   // Account Settings
@@ -124,32 +97,31 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                   SizedBox(height: 24.h),
 
-                  // App Settings
-                  _buildSectionHeader("App Settings", textColor),
-                  _buildSwitchOption(
-                    title: "Push Notifications",
-                    icon: Iconsax.notification,
-                    value: _notificationsEnabled,
-                    textColor: textColor,
-                    cardColor: cardColor,
-                    onChanged: (value) {
-                      setState(() {
-                        _notificationsEnabled = value;
-                      });
-                    },
-                  ),
-                  SizedBox(height: 12.h),
-                  _buildSwitchOption(
-                    title: "Dark Mode",
-                    icon: Iconsax.moon,
-                    value: themeProvider.themeMode == ThemeMode.dark,
-                    textColor: textColor,
-                    cardColor: cardColor,
-                    onChanged: (value) {
-                      themeProvider.toggleTheme(value);
-                    },
-                  ),
-                  SizedBox(height: 12.h),
+                    _buildSectionHeader("App Settings", textColor),
+                    _buildSwitchOption(
+                      title: "Use System Theme",
+                      icon: Iconsax.setting_config,
+                      value: themeProvider.themeMode == ThemeMode.system,
+                      textColor: textColor,
+                      cardColor: cardColor,
+                      onChanged: (value) {
+                        themeProvider.toggleSystemMode(value);
+                      },
+                    ),
+                    SizedBox(height: 12.h),
+                    _buildSwitchOption(
+                      title: "Dark Mode",
+                      icon: Iconsax.moon,
+                      value: themeProvider.isDarkMode,
+                      textColor: textColor,
+                      cardColor: cardColor,
+                      enabled: themeProvider.themeMode != ThemeMode.system,
+                      onChanged: (value) {
+                        themeProvider.toggleTheme(value);
+                      },
+                    ),
+                    SizedBox(height: 12.h),
+
                   _buildArrowOption(
                     title: "Language",
                     icon: Iconsax.global,
@@ -282,49 +254,53 @@ class _SettingsScreenState extends State<SettingsScreen> {
     required Color textColor,
     required Color cardColor,
     required ValueChanged<bool> onChanged,
+    bool enabled = true,
   }) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
-      decoration: BoxDecoration(
-        color: cardColor,
-        borderRadius: BorderRadius.circular(20.w),
-        border: Border.all(color: textColor.withOpacity(0.1), width: 1.w),
-        boxShadow: [
-          BoxShadow(
-            color: textColor.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: EdgeInsets.all(10.w),
-            decoration: BoxDecoration(
+    return Opacity(
+      opacity: enabled ? 1.0 : 0.5,
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
+        decoration: BoxDecoration(
+          color: cardColor,
+          borderRadius: BorderRadius.circular(20.w),
+          border: Border.all(color: textColor.withOpacity(0.1), width: 1.w),
+          boxShadow: [
+            BoxShadow(
               color: textColor.withOpacity(0.05),
-              shape: BoxShape.circle,
+              blurRadius: 10,
+              offset: const Offset(0, 4),
             ),
-            child: Icon(icon, color: textColor, size: 22.sp),
-          ),
-          SizedBox(width: 16.w),
-          Expanded(
-            child: Text(
-              title,
-              style: GoogleFonts.outfit(
-                fontSize: 16.sp,
-                fontWeight: FontWeight.w500,
-                color: textColor,
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: EdgeInsets.all(10.w),
+              decoration: BoxDecoration(
+                color: textColor.withOpacity(0.05),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, color: textColor, size: 22.sp),
+            ),
+            SizedBox(width: 16.w),
+            Expanded(
+              child: Text(
+                title,
+                style: GoogleFonts.outfit(
+                  fontSize: 16.sp,
+                  fontWeight: FontWeight.w500,
+                  color: textColor,
+                ),
               ),
             ),
-          ),
-          Switch(
-            value: value,
-            onChanged: onChanged,
-            activeTrackColor: textColor.withOpacity(0.5),
-            activeThumbColor: textColor,
-          ),
-        ],
+            Switch(
+              value: value,
+              onChanged: enabled ? onChanged : null,
+              activeTrackColor: textColor.withOpacity(0.5),
+              activeThumbColor: textColor,
+            ),
+          ],
+        ),
       ),
     );
   }

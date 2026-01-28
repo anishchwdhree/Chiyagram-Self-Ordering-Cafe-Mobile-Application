@@ -1,5 +1,7 @@
 import 'package:chiyagaram/models/cart_model.dart';
 import 'package:chiyagaram/responsive/size_config.dart';
+import 'package:chiyagaram/screens/widget/background_scaffold.dart';
+import 'package:chiyagaram/theme/theme_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -22,7 +24,15 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDark = themeProvider.isDarkMode;
+    final textColor = isDark ? Colors.white : const Color(0xFF3E2723);
+    final subTextColor = isDark ? Colors.white70 : const Color(0xFF5D4037);
+    final cardColor = isDark
+        ? const Color(0xFF5D4037).withOpacity(0.4)
+        : Colors.white.withValues(alpha: 0.4);
+
+    return BackgroundScaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -30,7 +40,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         leading: IconButton(
           icon: Icon(
             Icons.arrow_back_ios_new,
-            color: const Color(0xFF3E2723),
+            color: textColor,
             size: 20.sp,
           ),
           onPressed: () => Navigator.pop(context),
@@ -40,32 +50,14 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           style: GoogleFonts.philosopher(
             fontSize: 24.sp,
             fontWeight: FontWeight.bold,
-            color: const Color(0xFF3E2723),
+            color: textColor,
           ),
         ),
         centerTitle: true,
       ),
       body: Stack(
         children: [
-          // 1. Background Gradient
-          const RepaintBoundary(
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Color(0xFFFFF3E0),
-                    Color(0xFFFFECB3),
-                    Color(0xFFFBE9E7),
-                  ],
-                ),
-              ),
-              child: SizedBox.expand(),
-            ),
-          ),
-
-          // 2. Decorative Background Circles
+          // Decorative Background Circles
           Positioned(
             top: -50.w,
             right: -50.w,
@@ -74,10 +66,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               height: 200.w,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: const Color(0xFFFFCCBC).withValues(alpha: 0.4),
+                color: (isDark ? const Color(0xFF4E342E) : const Color(0xFFFFCCBC)).withValues(alpha: 0.4),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFFFFCCBC).withValues(alpha: 0.2),
+                    color: (isDark ? const Color(0xFF4E342E) : const Color(0xFFFFCCBC)).withValues(alpha: 0.2),
                     blurRadius: 50.w,
                     spreadRadius: 10.w,
                   ),
@@ -86,7 +78,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             ),
           ),
 
-          // 3. Content
+          // Content
           SafeArea(
             child: Consumer<CartModel>(
               builder: (context, cart, child) {
@@ -99,9 +91,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                       SizedBox(height: 20.w),
 
                       // Table Number Section
-                      _buildSectionTitle("Enter Table Details"),
+                      _buildSectionTitle("Enter Table Details", textColor),
                       SizedBox(height: 10.w),
                       _buildGlassContainer(
+                        cardColor: cardColor,
+                        textColor: textColor,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -110,7 +104,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                               style: GoogleFonts.outfit(
                                 fontSize: 16.sp,
                                 fontWeight: FontWeight.bold,
-                                color: const Color(0xFF3E2723),
+                                color: textColor,
                               ),
                             ),
                             SizedBox(height: 10.w),
@@ -119,18 +113,16 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                               keyboardType: TextInputType.number,
                               style: GoogleFonts.outfit(
                                 fontSize: 18.sp,
-                                color: const Color(0xFF3E2723),
+                                color: textColor,
                                 fontWeight: FontWeight.w600,
                               ),
                               decoration: InputDecoration(
                                 hintText: "Ex: 5",
                                 hintStyle: GoogleFonts.outfit(
-                                  color: const Color(
-                                    0xFF5D4037,
-                                  ).withValues(alpha: 0.5),
+                                  color: subTextColor.withValues(alpha: 0.5),
                                 ),
                                 filled: true,
-                                fillColor: Colors.white.withValues(alpha: 0.5),
+                                fillColor: isDark ? Colors.white.withOpacity(0.05) : Colors.white.withValues(alpha: 0.5),
                                 contentPadding: EdgeInsets.symmetric(
                                   horizontal: 20.w,
                                   vertical: 15.w,
@@ -142,13 +134,13 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                 enabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(15.w),
                                   borderSide: BorderSide(
-                                    color: Colors.white.withValues(alpha: 0.5),
+                                    color: isDark ? Colors.white12 : Colors.white.withValues(alpha: 0.5),
                                   ),
                                 ),
                                 focusedBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(15.w),
-                                  borderSide: const BorderSide(
-                                    color: Color(0xFF3E2723),
+                                  borderSide: BorderSide(
+                                    color: textColor,
                                     width: 1.5,
                                   ),
                                 ),
@@ -159,9 +151,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                               "Please enter the table number where you are seated.",
                               style: GoogleFonts.outfit(
                                 fontSize: 14.sp,
-                                color: const Color(
-                                  0xFF5D4037,
-                                ).withValues(alpha: 0.8),
+                                color: subTextColor.withValues(alpha: 0.8),
                               ),
                             ),
                           ],
@@ -171,21 +161,23 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                       SizedBox(height: 30.w),
 
                       // Order Summary Section
-                      _buildSectionTitle("Order Summary"),
+                      _buildSectionTitle("Order Summary", textColor),
                       SizedBox(height: 10.w),
                       _buildGlassContainer(
+                        cardColor: cardColor,
+                        textColor: textColor,
                         child: Column(
                           children: [
                             _buildSummaryRow(
                               "Subtotal",
                               cart.totalPrice.toStringAsFixed(0),
+                              textColor,
+                              subTextColor,
                             ),
                             SizedBox(height: 8.w),
-                            _buildSummaryRow("Serving Fee", "0"),
+                            _buildSummaryRow("Serving Fee", "0", textColor, subTextColor),
                             Divider(
-                              color: const Color(
-                                0xFF3E2723,
-                              ).withValues(alpha: 0.2),
+                              color: textColor.withValues(alpha: 0.2),
                               height: 24.w,
                             ),
                             Row(
@@ -196,7 +188,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                   style: GoogleFonts.philosopher(
                                     fontSize: 20.sp,
                                     fontWeight: FontWeight.bold,
-                                    color: const Color(0xFF3E2723),
+                                    color: textColor,
                                   ),
                                 ),
                                 Text(
@@ -204,7 +196,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                   style: GoogleFonts.philosopher(
                                     fontSize: 20.sp,
                                     fontWeight: FontWeight.bold,
-                                    color: const Color(0xFF3E2723),
+                                    color: textColor,
                                   ),
                                 ),
                               ],
@@ -261,7 +253,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                           height: 55.w,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(30.w),
-                            color: const Color(0xFF1A1A1A),
+                            color: isDark ? Colors.white : const Color(0xFF1A1A1A),
                             boxShadow: [
                               BoxShadow(
                                 color: Colors.black.withValues(alpha: 0.2),
@@ -276,7 +268,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                             style: GoogleFonts.outfit(
                               fontSize: 18.sp,
                               fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                              color: isDark ? Colors.black : Colors.white,
                             ),
                           ),
                         ),
@@ -293,30 +285,30 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     );
   }
 
-  Widget _buildSectionTitle(String title) {
+  Widget _buildSectionTitle(String title, Color textColor) {
     return Text(
       title,
       style: GoogleFonts.philosopher(
         fontSize: 20.sp,
         fontWeight: FontWeight.bold,
-        color: const Color(0xFF3E2723),
+        color: textColor,
       ),
     );
   }
 
-  Widget _buildGlassContainer({required Widget child}) {
+  Widget _buildGlassContainer({required Widget child, required Color cardColor, required Color textColor}) {
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.4),
+        color: cardColor,
         borderRadius: BorderRadius.circular(20.w),
         border: Border.all(
-          color: Colors.white.withValues(alpha: 0.6),
+          color: textColor.withValues(alpha: 0.1),
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF3E2723).withValues(alpha: 0.05),
+            color: textColor.withValues(alpha: 0.05),
             blurRadius: 10.w,
             offset: Offset(0, 4.w),
           ),
@@ -326,7 +318,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     );
   }
 
-  Widget _buildSummaryRow(String label, String value) {
+  Widget _buildSummaryRow(String label, String value, Color textColor, Color subTextColor) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -334,7 +326,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           label,
           style: GoogleFonts.outfit(
             fontSize: 16.sp,
-            color: const Color(0xFF5D4037),
+            color: subTextColor,
           ),
         ),
         Text(
@@ -342,7 +334,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           style: GoogleFonts.outfit(
             fontSize: 16.sp,
             fontWeight: FontWeight.w600,
-            color: const Color(0xFF3E2723),
+            color: textColor,
           ),
         ),
       ],

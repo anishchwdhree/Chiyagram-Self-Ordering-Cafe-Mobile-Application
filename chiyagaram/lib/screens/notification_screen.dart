@@ -1,3 +1,6 @@
+import 'package:chiyagaram/screens/widget/background_scaffold.dart';
+import 'package:chiyagaram/theme/theme_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:chiyagaram/responsive/size_config.dart';
@@ -66,15 +69,21 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFFFF3E0),
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDark = themeProvider.isDarkMode;
+    final textColor = isDark ? Colors.white : const Color(0xFF3E2723);
+    final cardColor = isDark
+        ? const Color(0xFF5D4037).withOpacity(0.4)
+        : Colors.white.withValues(alpha: 0.5);
+
+    return BackgroundScaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
           icon: Icon(
             Icons.arrow_back_ios,
-            color: const Color(0xFF3E2723),
+            color: textColor,
             size: 20.sp,
           ),
           onPressed: () => Navigator.pop(context),
@@ -84,7 +93,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
           style: GoogleFonts.philosopher(
             fontSize: 24.sp,
             fontWeight: FontWeight.bold,
-            color: const Color(0xFF3E2723),
+            color: textColor,
           ),
         ),
         centerTitle: true,
@@ -93,7 +102,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
             onPressed: () {},
             icon: Icon(
               Iconsax.tick_circle,
-              color: const Color(0xFF3E2723),
+              color: textColor,
               size: 24.sp,
             ),
             tooltip: "Mark all as read",
@@ -126,13 +135,13 @@ class _NotificationScreenState extends State<NotificationScreen> {
                     padding: EdgeInsets.symmetric(horizontal: 20.w),
                     decoration: BoxDecoration(
                       color: isSelected
-                          ? const Color(0xFF3E2723)
-                          : Colors.white.withValues(alpha: 0.5),
+                          ? (isDark ? Colors.white : const Color(0xFF3E2723))
+                          : cardColor,
                       borderRadius: BorderRadius.circular(20.w),
                       border: Border.all(
                         color: isSelected
                             ? Colors.transparent
-                            : const Color(0xFF3E2723).withValues(alpha: 0.1),
+                            : textColor.withValues(alpha: 0.1),
                       ),
                     ),
                     alignment: Alignment.center,
@@ -143,7 +152,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
                         fontWeight: isSelected
                             ? FontWeight.w600
                             : FontWeight.normal,
-                        color: isSelected ? Colors.white : Colors.black87,
+                        color: isSelected 
+                            ? (isDark ? Colors.black : Colors.white) 
+                            : textColor,
                       ),
                     ),
                   ),
@@ -154,13 +165,13 @@ class _NotificationScreenState extends State<NotificationScreen> {
           SizedBox(height: 20.h),
 
           // 2. Notification List
-          Expanded(child: _buildGroupedList()),
+          Expanded(child: _buildGroupedList(isDark, textColor, cardColor)),
         ],
       ),
     );
   }
 
-  Widget _buildGroupedList() {
+  Widget _buildGroupedList(bool isDark, Color textColor, Color cardColor) {
     List<Widget> listWidgets = [];
 
     for (var group in _allNotifications) {
@@ -181,7 +192,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
               style: GoogleFonts.outfit(
                 fontSize: 14.sp,
                 fontWeight: FontWeight.bold,
-                color: const Color(0xFF795548),
+                color: isDark ? Colors.white70 : const Color(0xFF795548),
                 letterSpacing: 0.5,
               ),
             ),
@@ -192,7 +203,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
           listWidgets.add(
             Padding(
               padding: EdgeInsets.fromLTRB(20.w, 0, 20.w, 16.h),
-              child: _buildNotificationItem(filteredItems[i]),
+              child: _buildNotificationItem(filteredItems[i], isDark, textColor, cardColor),
             ),
           );
         }
@@ -207,14 +218,14 @@ class _NotificationScreenState extends State<NotificationScreen> {
             Icon(
               Iconsax.notification_status,
               size: 64.sp,
-              color: const Color(0xFF3E2723).withValues(alpha: 0.3),
+              color: textColor.withValues(alpha: 0.3),
             ),
             SizedBox(height: 10.h),
             Text(
               "No notifications found",
               style: GoogleFonts.outfit(
                 fontSize: 16.sp,
-                color: const Color(0xFF3E2723).withValues(alpha: 0.5),
+                color: textColor.withValues(alpha: 0.5),
               ),
             ),
           ],
@@ -241,7 +252,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
     );
   }
 
-  Widget _buildNotificationItem(Map<String, dynamic> data) {
+  Widget _buildNotificationItem(Map<String, dynamic> data, bool isDark, Color textColor, Color cardColor) {
     return Dismissible(
       key: UniqueKey(),
       direction: DismissDirection.endToStart,
@@ -261,16 +272,16 @@ class _NotificationScreenState extends State<NotificationScreen> {
         padding: EdgeInsets.all(16.w),
         decoration: BoxDecoration(
           color: data['isUnread']
-              ? Colors.white.withValues(alpha: 0.95)
-              : Colors.white.withValues(alpha: 0.6),
+              ? (isDark ? Colors.white.withOpacity(0.15) : Colors.white.withValues(alpha: 0.95))
+              : cardColor,
           borderRadius: BorderRadius.circular(20.w),
           border: Border.all(
-            color: Colors.white.withValues(alpha: 0.5),
+            color: textColor.withValues(alpha: 0.1),
             width: 1.w,
           ),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFF8D6E63).withValues(alpha: 0.05),
+              color: textColor.withValues(alpha: 0.05),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -282,7 +293,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
             Container(
               padding: EdgeInsets.all(10.w),
               decoration: BoxDecoration(
-                color: (data['color'] as Color).withValues(alpha: 0.1),
+                color: (data['color'] as Color).withValues(alpha: 0.15),
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -304,14 +315,14 @@ class _NotificationScreenState extends State<NotificationScreen> {
                         style: GoogleFonts.outfit(
                           fontSize: 16.sp,
                           fontWeight: FontWeight.w600,
-                          color: const Color(0xFF3E2723),
+                          color: textColor,
                         ),
                       ),
                       Text(
                         data['time'],
                         style: GoogleFonts.outfit(
                           fontSize: 11.sp,
-                          color: const Color(0xFF795548).withValues(alpha: 0.7),
+                          color: isDark ? Colors.white54 : const Color(0xFF795548).withValues(alpha: 0.7),
                         ),
                       ),
                     ],
@@ -321,7 +332,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                     data['body'],
                     style: GoogleFonts.outfit(
                       fontSize: 13.sp,
-                      color: const Color(0xFF5D4037).withValues(alpha: 0.9),
+                      color: isDark ? Colors.white70 : const Color(0xFF5D4037).withValues(alpha: 0.9),
                       height: 1.4,
                     ),
                   ),
