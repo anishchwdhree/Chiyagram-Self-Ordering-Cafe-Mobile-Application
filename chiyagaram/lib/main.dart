@@ -1,4 +1,6 @@
 import 'package:chiyagaram/screens/onboarding_screen.dart';
+import 'package:chiyagaram/theme/app_theme.dart';
+import 'package:chiyagaram/theme/theme_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
@@ -18,10 +20,12 @@ void main() {
     ),
   );
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
-  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
   runApp(
-    ChangeNotifierProvider(
-      create: (context) => CartModel(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => CartModel()),
+        ChangeNotifierProvider(create: (context) => ThemeProvider()),
+      ],
       child: const MyApp(),
     ),
   );
@@ -32,15 +36,17 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'ChiyaGharam',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF8D6E63)),
-        useMaterial3: true,
-        textTheme: GoogleFonts.outfitTextTheme(),
-      ),
-      home: const OnboardingScreen(),
+    return Consumer<ThemeProvider>(
+      builder: (context, themeProvider, child) {
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: 'ChiyaGharam',
+          theme: AppTheme.lightTheme,
+          darkTheme: AppTheme.darkTheme,
+          themeMode: themeProvider.themeMode,
+          home: const OnboardingScreen(),
+        );
+      },
     );
   }
 }

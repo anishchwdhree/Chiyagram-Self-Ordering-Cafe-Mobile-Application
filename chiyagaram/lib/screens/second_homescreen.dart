@@ -1,4 +1,6 @@
 import 'package:chiyagaram/profile/profile_screen.dart';
+import 'package:chiyagaram/theme/app_colors.dart';
+import 'package:chiyagaram/theme/theme_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:chiyagaram/bottom%20bar%20screens/bottom_navbar.dart';
 import 'package:chiyagaram/responsive/size_config.dart';
@@ -6,6 +8,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:chiyagaram/screens/widget/hero_carousel.dart';
 import 'package:chiyagaram/screens/widget/recommendation_section.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:provider/provider.dart';
 
 import 'package:chiyagaram/bottom%20bar%20screens/cart_screen.dart';
 import 'package:chiyagaram/screens/notification_screen.dart';
@@ -93,23 +96,33 @@ class _HomeTabState extends State<HomeTab> {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDark = themeProvider.isDarkMode;
+    final textColor = isDark ? Colors.white : const Color(0xFF3E2723);
+
     return Stack(
       children: [
         // 1. Background Gradient
-        const RepaintBoundary(
+        RepaintBoundary(
           child: DecoratedBox(
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [
-                  Color(0xFFFFF3E0),
-                  Color(0xFFFFECB3),
-                  Color(0xFFFBE9E7),
-                ],
+                colors: isDark
+                    ? [
+                        AppColors.darkBgStart,
+                        AppColors.darkBgMiddle,
+                        AppColors.darkBgEnd,
+                      ]
+                    : [
+                        AppColors.backgroundGradientStart,
+                        AppColors.backgroundGradientMiddle,
+                        AppColors.backgroundGradientEnd,
+                      ],
               ),
             ),
-            child: SizedBox.expand(),
+            child: const SizedBox.expand(),
           ),
         ),
 
@@ -121,7 +134,7 @@ class _HomeTabState extends State<HomeTab> {
               right: -50.w,
               child: BackgroundCircle(
                 size: 200.w,
-                color: const Color(0xFFFFCCBC),
+                color: isDark ? const Color(0xFF4E342E) : const Color(0xFFFFCCBC),
                 opacity: 0.4,
               ),
             ),
@@ -130,7 +143,7 @@ class _HomeTabState extends State<HomeTab> {
               left: -30.w,
               child: BackgroundCircle(
                 size: 140.w,
-                color: const Color(0xFFFFE0B2),
+                color: isDark ? const Color(0xFF5D4037) : const Color(0xFFFFE0B2),
                 opacity: 0.3,
               ),
             ),
@@ -139,7 +152,7 @@ class _HomeTabState extends State<HomeTab> {
               right: 0,
               child: BackgroundCircle(
                 size: 120.w,
-                color: const Color(0xFFD7CCC8),
+                color: isDark ? const Color(0xFF3E2723) : const Color(0xFFD7CCC8),
                 opacity: 0.2,
               ),
             ),
@@ -169,7 +182,7 @@ class _HomeTabState extends State<HomeTab> {
                           style: GoogleFonts.philosopher(
                             fontSize: 35.sp,
                             fontWeight: FontWeight.w700,
-                            color: const Color(0xFF3E2723),
+                            color: textColor,
                             letterSpacing: -1.2,
                             height: 1,
                           ),
@@ -180,9 +193,7 @@ class _HomeTabState extends State<HomeTab> {
                           textAlign: TextAlign.left,
                           style: GoogleFonts.outfit(
                             fontSize: 10.sp,
-                            color: const Color(
-                              0xFF795548,
-                            ).withValues(alpha: 0.6),
+                            color: isDark ? Colors.white70 : const Color(0xFF795548).withOpacity(0.6),
                             fontWeight: FontWeight.w500,
                             letterSpacing: 0.8,
                           ),
@@ -227,7 +238,7 @@ class _HomeTabState extends State<HomeTab> {
                     icon: Icon(
                       Iconsax.notification,
                       size: 28.sp,
-                      color: const Color(0xFF3E2723),
+                      color: textColor,
                     ),
                   ),
                   if (_notificationCount > 0)

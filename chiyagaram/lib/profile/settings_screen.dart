@@ -1,3 +1,4 @@
+import 'package:chiyagaram/theme/theme_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax/iconsax.dart';
@@ -9,6 +10,7 @@ import 'package:chiyagaram/profile/setting/help_support_screen.dart';
 import 'package:chiyagaram/profile/setting/privacy_policy_screen.dart';
 import 'package:chiyagaram/profile/setting/terms_of_service_screen.dart';
 import 'package:chiyagaram/responsive/size_config.dart';
+import 'package:provider/provider.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -19,28 +21,44 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   bool _notificationsEnabled = true;
-  bool _darkModeEnabled = false;
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDark = themeProvider.isDarkMode;
+    final textColor = isDark ? Colors.white : const Color(0xFF3E2723);
+    final cardColor = isDark
+        ? const Color(0xFF5D4037).withOpacity(0.4)
+        : Colors.white.withValues(alpha: 0.6);
+
     return Scaffold(
       body: Stack(
         children: [
           // Background Gradient
-          const RepaintBoundary(
+          RepaintBoundary(
             child: DecoratedBox(
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Color(0xFFFFF3E0),
-                    Color(0xFFFFECB3),
-                    Color(0xFFFBE9E7),
-                  ],
-                ),
+                gradient: isDark
+                    ? const LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          Color(0xFF2D1B18),
+                          Color(0xFF3E2723),
+                          Color(0xFF1A1210),
+                        ],
+                      )
+                    : const LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          Color(0xFFFFF3E0),
+                          Color(0xFFFFECB3),
+                          Color(0xFFFBE9E7),
+                        ],
+                      ),
               ),
-              child: SizedBox.expand(),
+              child: const SizedBox.expand(),
             ),
           ),
           SafeArea(
@@ -54,10 +72,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     children: [
                       IconButton(
                         onPressed: () => Navigator.pop(context),
-                        icon: const Icon(
-                          Icons.arrow_back_ios_new,
-                          color: Color(0xFF3E2723),
-                        ),
+                        icon: Icon(Icons.arrow_back_ios_new, color: textColor),
                       ),
                       Expanded(
                         child: Text(
@@ -66,7 +81,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           style: GoogleFonts.philosopher(
                             fontSize: 20.sp,
                             fontWeight: FontWeight.bold,
-                            color: const Color(0xFF3E2723),
+                            color: textColor,
                           ),
                         ),
                       ),
@@ -76,10 +91,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   SizedBox(height: 20.h),
 
                   // Account Settings
-                  _buildSectionHeader("Account"),
+                  _buildSectionHeader("Account", textColor),
                   _buildArrowOption(
                     title: "Change Password",
                     icon: Iconsax.lock,
+                    textColor: textColor,
+                    cardColor: cardColor,
                     onTap: () {
                       Navigator.push(
                         context,
@@ -94,6 +111,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     title: "Delete Account",
                     icon: Iconsax.trash,
                     isDestructive: true,
+                    textColor: textColor,
+                    cardColor: cardColor,
                     onTap: () {
                       Navigator.push(
                         context,
@@ -106,11 +125,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   SizedBox(height: 24.h),
 
                   // App Settings
-                  _buildSectionHeader("App Settings"),
+                  _buildSectionHeader("App Settings", textColor),
                   _buildSwitchOption(
                     title: "Push Notifications",
                     icon: Iconsax.notification,
                     value: _notificationsEnabled,
+                    textColor: textColor,
+                    cardColor: cardColor,
                     onChanged: (value) {
                       setState(() {
                         _notificationsEnabled = value;
@@ -121,11 +142,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   _buildSwitchOption(
                     title: "Dark Mode",
                     icon: Iconsax.moon,
-                    value: _darkModeEnabled,
+                    value: themeProvider.themeMode == ThemeMode.dark,
+                    textColor: textColor,
+                    cardColor: cardColor,
                     onChanged: (value) {
-                      setState(() {
-                        _darkModeEnabled = value;
-                      });
+                      themeProvider.toggleTheme(value);
                     },
                   ),
                   SizedBox(height: 12.h),
@@ -133,15 +154,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     title: "Language",
                     icon: Iconsax.global,
                     trailingText: "English",
+                    textColor: textColor,
+                    cardColor: cardColor,
                     onTap: () {},
                   ),
                   SizedBox(height: 24.h),
 
                   // Support
-                  _buildSectionHeader("Support"),
+                  _buildSectionHeader("Support", textColor),
                   _buildArrowOption(
                     title: "Help Center",
                     icon: Iconsax.message_question,
+                    textColor: textColor,
+                    cardColor: cardColor,
                     onTap: () {
                       Navigator.push(
                         context,
@@ -155,6 +180,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   _buildArrowOption(
                     title: "Feedback",
                     icon: Iconsax.message_edit,
+                    textColor: textColor,
+                    cardColor: cardColor,
                     onTap: () {
                       Navigator.push(
                         context,
@@ -168,6 +195,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   _buildArrowOption(
                     title: "Privacy Policy",
                     icon: Iconsax.security_safe,
+                    textColor: textColor,
+                    cardColor: cardColor,
                     onTap: () {
                       Navigator.push(
                         context,
@@ -181,6 +210,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   _buildArrowOption(
                     title: "Terms of Service",
                     icon: Iconsax.document_text,
+                    textColor: textColor,
+                    cardColor: cardColor,
                     onTap: () {
                       Navigator.push(
                         context,
@@ -194,6 +225,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   _buildArrowOption(
                     title: "About App",
                     icon: Iconsax.info_circle,
+                    textColor: textColor,
+                    cardColor: cardColor,
                     onTap: () {
                       Navigator.push(
                         context,
@@ -214,7 +247,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       "Version 1.0.0",
                       style: GoogleFonts.outfit(
                         fontSize: 12.sp,
-                        color: const Color(0xFF3E2723).withValues(alpha: 0.5),
+                        color: textColor.withOpacity(0.5),
                       ),
                     ),
                   ),
@@ -228,7 +261,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  Widget _buildSectionHeader(String title) {
+  Widget _buildSectionHeader(String title, Color textColor) {
     return Padding(
       padding: EdgeInsets.only(bottom: 12.h, left: 8.w),
       child: Text(
@@ -236,7 +269,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         style: GoogleFonts.outfit(
           fontSize: 14.sp,
           fontWeight: FontWeight.bold,
-          color: const Color(0xFF3E2723).withValues(alpha: 0.6),
+          color: textColor.withOpacity(0.6),
         ),
       ),
     );
@@ -246,17 +279,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
     required String title,
     required IconData icon,
     required bool value,
+    required Color textColor,
+    required Color cardColor,
     required ValueChanged<bool> onChanged,
   }) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.6),
+        color: cardColor,
         borderRadius: BorderRadius.circular(20.w),
-        border: Border.all(color: Colors.white, width: 1.w),
+        border: Border.all(color: textColor.withOpacity(0.1), width: 1.w),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF3E2723).withValues(alpha: 0.05),
+            color: textColor.withOpacity(0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -267,10 +302,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
           Container(
             padding: EdgeInsets.all(10.w),
             decoration: BoxDecoration(
-              color: const Color(0xFF3E2723).withValues(alpha: 0.05),
+              color: textColor.withOpacity(0.05),
               shape: BoxShape.circle,
             ),
-            child: Icon(icon, color: const Color(0xFF3E2723), size: 22.sp),
+            child: Icon(icon, color: textColor, size: 22.sp),
           ),
           SizedBox(width: 16.w),
           Expanded(
@@ -279,15 +314,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
               style: GoogleFonts.outfit(
                 fontSize: 16.sp,
                 fontWeight: FontWeight.w500,
-                color: const Color(0xFF3E2723),
+                color: textColor,
               ),
             ),
           ),
           Switch(
             value: value,
             onChanged: onChanged,
-            activeTrackColor: const Color(0xFF3E2723).withValues(alpha: 0.5),
-            activeThumbColor: const Color(0xFF3E2723),
+            activeTrackColor: textColor.withOpacity(0.5),
+            activeThumbColor: textColor,
           ),
         ],
       ),
@@ -298,6 +333,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
     required String title,
     required IconData icon,
     required VoidCallback onTap,
+    required Color textColor,
+    required Color cardColor,
     bool isDestructive = false,
     String? trailingText,
   }) {
@@ -309,12 +346,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
         child: Container(
           padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.6),
+            color: cardColor,
             borderRadius: BorderRadius.circular(20.w),
-            border: Border.all(color: Colors.white, width: 1.w),
+            border: Border.all(color: textColor.withOpacity(0.1), width: 1.w),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFF3E2723).withValues(alpha: 0.05),
+                color: textColor.withOpacity(0.05),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),
@@ -326,13 +363,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 padding: EdgeInsets.all(10.w),
                 decoration: BoxDecoration(
                   color: isDestructive
-                      ? Colors.red.withValues(alpha: 0.1)
-                      : const Color(0xFF3E2723).withValues(alpha: 0.05),
+                      ? Colors.red.withOpacity(0.1)
+                      : textColor.withOpacity(0.05),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
                   icon,
-                  color: isDestructive ? Colors.red : const Color(0xFF3E2723),
+                  color: isDestructive ? Colors.red : textColor,
                   size: 22.sp,
                 ),
               ),
@@ -343,7 +380,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   style: GoogleFonts.outfit(
                     fontSize: 16.sp,
                     fontWeight: FontWeight.w500,
-                    color: isDestructive ? Colors.red : const Color(0xFF3E2723),
+                    color: isDestructive ? Colors.red : textColor,
                   ),
                 ),
               ),
@@ -354,14 +391,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     trailingText,
                     style: GoogleFonts.outfit(
                       fontSize: 14.sp,
-                      color: const Color(0xFF3E2723).withValues(alpha: 0.5),
+                      color: textColor.withOpacity(0.5),
                     ),
                   ),
                 ),
               Icon(
                 Icons.arrow_forward_ios_rounded,
                 size: 16.sp,
-                color: const Color(0xFFA1887F),
+                color: isDestructive
+                    ? Colors.red.withOpacity(0.5)
+                    : textColor.withOpacity(0.5),
               ),
             ],
           ),

@@ -9,12 +9,15 @@ class AppColors {
     0xFF795548,
   ); // Medium brown - Secondary brand color
 
-  // ========== BACKGROUND GRADIENTS ==========
-  static const Color backgroundGradientStart = Color(0xFFFFF3E0); // Light cream
-  static const Color backgroundGradientMiddle = Color(
-    0xFFFFECB3,
-  ); // Light yellow
-  static const Color backgroundGradientEnd = Color(0xFFFBE9E7); // Light pink
+  // ========== BACKGROUND GRADIENTS (LIGHT) ==========
+  static const Color backgroundGradientStart = Color(0xFFFFF3E0);
+  static const Color backgroundGradientMiddle = Color(0xFFFFECB3);
+  static const Color backgroundGradientEnd = Color(0xFFFBE9E7);
+
+  // ========== BACKGROUND GRADIENTS (DARK) ==========
+  static const Color darkBgStart = Color(0xFF2D1B18);
+  static const Color darkBgMiddle = Color(0xFF3E2723);
+  static const Color darkBgEnd = Color(0xFF1A1210);
 
   // ========== BROWN PALETTE EXTENSIONS ==========
   static const Color deepBrown = Color(
