@@ -73,7 +73,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
     final isDark = themeProvider.isDarkMode;
     final textColor = isDark ? Colors.white : const Color(0xFF3E2723);
     final cardColor = isDark
-        ? const Color(0xFF5D4037).withOpacity(0.4)
+        ? const Color(0xFF5D4037).withValues(alpha: 0.4)
         : Colors.white.withValues(alpha: 0.5);
 
     return BackgroundScaffold(
@@ -81,11 +81,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back_ios,
-            color: textColor,
-            size: 20.sp,
-          ),
+          icon: Icon(Icons.arrow_back_ios, color: textColor, size: 20.sp),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
@@ -100,11 +96,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
         actions: [
           IconButton(
             onPressed: () {},
-            icon: Icon(
-              Iconsax.tick_circle,
-              color: textColor,
-              size: 24.sp,
-            ),
+            icon: Icon(Iconsax.tick_circle, color: textColor, size: 24.sp),
             tooltip: "Mark all as read",
           ),
           SizedBox(width: 10.w),
@@ -152,8 +144,8 @@ class _NotificationScreenState extends State<NotificationScreen> {
                         fontWeight: isSelected
                             ? FontWeight.w600
                             : FontWeight.normal,
-                        color: isSelected 
-                            ? (isDark ? Colors.black : Colors.white) 
+                        color: isSelected
+                            ? (isDark ? Colors.black : Colors.white)
                             : textColor,
                       ),
                     ),
@@ -203,7 +195,12 @@ class _NotificationScreenState extends State<NotificationScreen> {
           listWidgets.add(
             Padding(
               padding: EdgeInsets.fromLTRB(20.w, 0, 20.w, 16.h),
-              child: _buildNotificationItem(filteredItems[i], isDark, textColor, cardColor),
+              child: _buildNotificationItem(
+                filteredItems[i],
+                isDark,
+                textColor,
+                cardColor,
+              ),
             ),
           );
         }
@@ -252,7 +249,12 @@ class _NotificationScreenState extends State<NotificationScreen> {
     );
   }
 
-  Widget _buildNotificationItem(Map<String, dynamic> data, bool isDark, Color textColor, Color cardColor) {
+  Widget _buildNotificationItem(
+    Map<String, dynamic> data,
+    bool isDark,
+    Color textColor,
+    Color cardColor,
+  ) {
     return Dismissible(
       key: UniqueKey(),
       direction: DismissDirection.endToStart,
@@ -272,7 +274,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
         padding: EdgeInsets.all(16.w),
         decoration: BoxDecoration(
           color: data['isUnread']
-              ? (isDark ? Colors.white.withOpacity(0.15) : Colors.white.withValues(alpha: 0.95))
+              ? (isDark
+                    ? Colors.white.withValues(alpha: 0.15)
+                    : Colors.white.withValues(alpha: 0.95))
               : cardColor,
           borderRadius: BorderRadius.circular(20.w),
           border: Border.all(
@@ -322,7 +326,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
                         data['time'],
                         style: GoogleFonts.outfit(
                           fontSize: 11.sp,
-                          color: isDark ? Colors.white54 : const Color(0xFF795548).withValues(alpha: 0.7),
+                          color: isDark
+                              ? Colors.white54
+                              : const Color(0xFF795548).withValues(alpha: 0.7),
                         ),
                       ),
                     ],
@@ -332,7 +338,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
                     data['body'],
                     style: GoogleFonts.outfit(
                       fontSize: 13.sp,
-                      color: isDark ? Colors.white70 : const Color(0xFF5D4037).withValues(alpha: 0.9),
+                      color: isDark
+                          ? Colors.white70
+                          : const Color(0xFF5D4037).withValues(alpha: 0.9),
                       height: 1.4,
                     ),
                   ),

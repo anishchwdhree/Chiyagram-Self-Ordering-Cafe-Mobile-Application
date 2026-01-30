@@ -1,4 +1,5 @@
 import 'package:chiyagaram/screens/widget/background_scaffold.dart';
+import 'package:chiyagaram/theme/app_colors.dart';
 import 'package:chiyagaram/theme/theme_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:chiyagaram/animations/fade_animation.dart';
@@ -33,10 +34,11 @@ class _SignupScreenState extends State<SignupScreen> {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isDark = themeProvider.isDarkMode;
     final textColor = isDark ? Colors.white : const Color(0xFF3E2723);
-    final subTextColor = isDark ? Colors.white70 : const Color(0xFF795548).withValues(alpha: 0.5);
+    final subTextColor = isDark
+        ? Colors.white70
+        : const Color(0xFF795548).withValues(alpha: 0.5);
 
     return BackgroundScaffold(
-      resizeToAvoidBottomInset: false,
       body: SafeArea(
         child: SizedBox(
           height: MediaQuery.of(context).size.height,
@@ -176,7 +178,9 @@ class _SignupScreenState extends State<SignupScreen> {
             });
           },
           style: ElevatedButton.styleFrom(
-            backgroundColor: isDark ? Colors.white : const Color.fromARGB(255, 0, 0, 0),
+            backgroundColor: isDark
+                ? Colors.white
+                : const Color.fromARGB(255, 0, 0, 0),
             foregroundColor: isDark ? Colors.black : Colors.white,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(30),
@@ -185,7 +189,9 @@ class _SignupScreenState extends State<SignupScreen> {
             shadowColor: const Color(0xFF5D4037).withValues(alpha: 0.5),
           ),
           child: _isLoading
-              ? CircularProgressIndicator(color: isDark ? Colors.black : Colors.white)
+              ? CircularProgressIndicator(
+                  color: isDark ? Colors.black : Colors.white,
+                )
               : Text(
                   'SIGN UP',
                   style: GoogleFonts.outfit(
@@ -204,7 +210,9 @@ class _SignupScreenState extends State<SignupScreen> {
       delay: 0.7,
       child: Row(
         children: [
-          Expanded(child: Divider(color: isDark ? Colors.white24 : Colors.black12)),
+          Expanded(
+            child: Divider(color: isDark ? Colors.white24 : Colors.black12),
+          ),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 16.w),
             child: Text(
@@ -215,7 +223,9 @@ class _SignupScreenState extends State<SignupScreen> {
               ),
             ),
           ),
-          Expanded(child: Divider(color: isDark ? Colors.white24 : Colors.black12)),
+          Expanded(
+            child: Divider(color: isDark ? Colors.white24 : Colors.black12),
+          ),
         ],
       ),
     );
@@ -255,7 +265,7 @@ class _SignupScreenState extends State<SignupScreen> {
             child: Text(
               "Login",
               style: GoogleFonts.inter(
-                color: isDark ? Colors.white : const Color(0xFF5D4037),
+                color: isDark ? AppColors.white : AppColors.secondary,
                 fontWeight: FontWeight.bold,
                 fontSize: 14.sp,
               ),
@@ -327,7 +337,7 @@ class _CustomTextField extends StatelessWidget {
               ),
               prefixIcon: Icon(
                 icon,
-                color: isDark ? Colors.white70 : const Color(0xFF8D6E63),
+                color: isDark ? Colors.white70 : AppColors.mediumBrown,
               ),
               border: InputBorder.none,
               contentPadding: EdgeInsets.symmetric(
@@ -367,9 +377,7 @@ class _SocialButton extends StatelessWidget {
         decoration: BoxDecoration(
           color: isDark ? Colors.white10 : Colors.white,
           borderRadius: BorderRadius.circular(30),
-          border: Border.all(
-            color: isDark ? Colors.white24 : Colors.black12,
-          ),
+          border: Border.all(color: isDark ? Colors.white24 : Colors.black12),
           boxShadow: [
             if (!isDark)
               BoxShadow(
@@ -388,7 +396,7 @@ class _SocialButton extends StatelessWidget {
               Icon(
                 icon,
                 size: 24.sp,
-                color: isDark ? Colors.white : const Color(0xFF5D4037),
+                color: isDark ? Colors.white : AppColors.secondary,
               ),
             SizedBox(width: 12.w),
             Text(

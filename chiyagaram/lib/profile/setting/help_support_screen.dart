@@ -2,22 +2,26 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:chiyagaram/responsive/size_config.dart';
+import 'package:chiyagaram/theme/app_colors.dart';
+import 'package:chiyagaram/theme/theme_provider.dart';
+import 'package:provider/provider.dart';
 
 class HelpSupportScreen extends StatelessWidget {
   const HelpSupportScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDark = themeProvider.isDarkMode;
+    final textColor = isDark ? Colors.white : const Color(0xFF3E2723);
+
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_ios_new_rounded,
-            color: Color(0xFF3E2723),
-          ),
+          icon: Icon(Icons.arrow_back_ios_new_rounded, color: textColor),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
@@ -25,28 +29,34 @@ class HelpSupportScreen extends StatelessWidget {
           style: GoogleFonts.philosopher(
             fontSize: 24.sp,
             fontWeight: FontWeight.bold,
-            color: const Color(0xFF3E2723),
+            color: textColor,
           ),
         ),
         centerTitle: true,
       ),
       body: Stack(
         children: [
-          // Background Gradient (Consistent with ProfileScreen)
-          const RepaintBoundary(
+          // Background Gradient
+          RepaintBoundary(
             child: DecoratedBox(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: [
-                    Color(0xFFFFF3E0),
-                    Color(0xFFFFECB3),
-                    Color(0xFFFBE9E7),
-                  ],
+                  colors: isDark
+                      ? [
+                          AppColors.igBlack,
+                          AppColors.igDarkGrey,
+                          AppColors.igBlack,
+                        ]
+                      : [
+                          const Color(0xFFFFF3E0),
+                          const Color(0xFFFFECB3),
+                          const Color(0xFFFBE9E7),
+                        ],
                 ),
               ),
-              child: SizedBox.expand(),
+              child: const SizedBox.expand(),
             ),
           ),
           SafeArea(
@@ -55,31 +65,41 @@ class HelpSupportScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildSectionTitle("Frequently Asked Questions"),
+                  _buildSectionTitle("Frequently Asked Questions", textColor),
                   SizedBox(height: 16.h),
                   _buildFAQItem(
                     "How do I track my order?",
                     "You can track your order status in real-time from the 'My Orders' section in your profile.",
+                    isDark,
+                    textColor,
                   ),
                   _buildFAQItem(
                     "How does the self-ordering work?",
                     "Simply browse the menu, add items to your cart, and place your order. You'll be notified when your order is ready.",
+                    isDark,
+                    textColor,
                   ),
                   _buildFAQItem(
                     "What payment methods do you accept?",
                     "We accept credit/debit cards, digital wallets, and cash payments at the counter.",
+                    isDark,
+                    textColor,
                   ),
                   _buildFAQItem(
                     "How do I contact customer support?",
                     "You can reach us via email at support@chiyagram.com or call us directly using the contact options below.",
+                    isDark,
+                    textColor,
                   ),
                   SizedBox(height: 32.h),
-                  _buildSectionTitle("Contact Us"),
+                  _buildSectionTitle("Contact Us", textColor),
                   SizedBox(height: 16.h),
                   _buildContactCard(
                     icon: Iconsax.sms,
                     title: "Email Support",
                     subtitle: "support@chiyagram.com",
+                    isDark: isDark,
+                    textColor: textColor,
                     onTap: () {
                       // Implement email launch
                     },
@@ -89,6 +109,8 @@ class HelpSupportScreen extends StatelessWidget {
                     icon: Iconsax.call,
                     title: "Phone Support",
                     subtitle: "+977 9800000000",
+                    isDark: isDark,
+                    textColor: textColor,
                     onTap: () {
                       // Implement phone launch
                     },
@@ -98,19 +120,10 @@ class HelpSupportScreen extends StatelessWidget {
                     icon: Iconsax.location,
                     title: "Visit Us",
                     subtitle: "Kathmandu, Nepal",
+                    isDark: isDark,
+                    textColor: textColor,
                     onTap: () {},
                   ),
-                  SizedBox(height: 32.h),
-                  // _buildSectionTitle("Social Media"),
-                  // SizedBox(height: 16.h),
-                  // Row(
-                  //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  //   children: [
-                  //     _buildSocialButton(Iconsax.instagram, () {}),
-                  //     _buildSocialButton(Iconsax.facebook, () {}),
-                  //     _buildSocialButton(Iconsax.global, () {}),
-                  //   ],
-                  // ),
                   SizedBox(height: 32.h),
                 ],
               ),
@@ -121,27 +134,39 @@ class HelpSupportScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSectionTitle(String title) {
+  Widget _buildSectionTitle(String title, Color textColor) {
     return Text(
       title,
       style: GoogleFonts.outfit(
         fontSize: 18.sp,
         fontWeight: FontWeight.bold,
-        color: const Color(0xFF3E2723),
+        color: textColor,
       ),
     );
   }
 
-  Widget _buildFAQItem(String question, String answer) {
+  Widget _buildFAQItem(
+    String question,
+    String answer,
+    bool isDark,
+    Color textColor,
+  ) {
     return Container(
       margin: EdgeInsets.only(bottom: 12.h),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.6),
+        color: isDark
+            ? AppColors.igSurface
+            : Colors.white.withValues(alpha: 0.6),
         borderRadius: BorderRadius.circular(16.w),
-        border: Border.all(color: Colors.white, width: 1.w),
+        border: Border.all(
+          color: isDark ? AppColors.igBorder : Colors.white,
+          width: 1.w,
+        ),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF3E2723).withValues(alpha: 0.05),
+            color: (isDark ? Colors.black : const Color(0xFF3E2723)).withValues(
+              alpha: 0.05,
+            ),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -150,14 +175,14 @@ class HelpSupportScreen extends StatelessWidget {
       child: Theme(
         data: ThemeData().copyWith(dividerColor: Colors.transparent),
         child: ExpansionTile(
-          iconColor: const Color(0xFF3E2723),
-          collapsedIconColor: const Color(0xFF3E2723),
+          iconColor: textColor,
+          collapsedIconColor: textColor,
           title: Text(
             question,
             style: GoogleFonts.outfit(
               fontSize: 16.sp,
               fontWeight: FontWeight.w600,
-              color: const Color(0xFF3E2723),
+              color: textColor,
             ),
           ),
           children: [
@@ -167,7 +192,9 @@ class HelpSupportScreen extends StatelessWidget {
                 answer,
                 style: GoogleFonts.outfit(
                   fontSize: 14.sp,
-                  color: const Color(0xFF795548),
+                  color: isDark
+                      ? AppColors.igTextSecondary
+                      : const Color(0xFF795548),
                   height: 1.5,
                 ),
               ),
@@ -182,6 +209,8 @@ class HelpSupportScreen extends StatelessWidget {
     required IconData icon,
     required String title,
     required String subtitle,
+    required bool isDark,
+    required Color textColor,
     required VoidCallback onTap,
   }) {
     return Material(
@@ -192,12 +221,18 @@ class HelpSupportScreen extends StatelessWidget {
         child: Container(
           padding: EdgeInsets.all(16.w),
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.6),
+            color: isDark
+                ? AppColors.igSurface
+                : Colors.white.withValues(alpha: 0.6),
             borderRadius: BorderRadius.circular(16.w),
-            border: Border.all(color: Colors.white, width: 1.w),
+            border: Border.all(
+              color: isDark ? AppColors.igBorder : Colors.white,
+              width: 1.w,
+            ),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFF3E2723).withValues(alpha: 0.05),
+                color: (isDark ? Colors.black : const Color(0xFF3E2723))
+                    .withValues(alpha: 0.05),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),
@@ -208,10 +243,10 @@ class HelpSupportScreen extends StatelessWidget {
               Container(
                 padding: EdgeInsets.all(10.w),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF3E2723).withValues(alpha: 0.05),
+                  color: textColor.withValues(alpha: 0.05),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(icon, color: const Color(0xFF3E2723), size: 24.sp),
+                child: Icon(icon, color: textColor, size: 24.sp),
               ),
               SizedBox(width: 16.w),
               Column(
@@ -222,7 +257,7 @@ class HelpSupportScreen extends StatelessWidget {
                     style: GoogleFonts.outfit(
                       fontSize: 16.sp,
                       fontWeight: FontWeight.w600,
-                      color: const Color(0xFF3E2723),
+                      color: textColor,
                     ),
                   ),
                   SizedBox(height: 4.h),
@@ -230,7 +265,9 @@ class HelpSupportScreen extends StatelessWidget {
                     subtitle,
                     style: GoogleFonts.outfit(
                       fontSize: 14.sp,
-                      color: const Color(0xFF795548),
+                      color: isDark
+                          ? AppColors.igTextSecondary
+                          : const Color(0xFF795548),
                     ),
                   ),
                 ],
@@ -239,7 +276,7 @@ class HelpSupportScreen extends StatelessWidget {
               Icon(
                 Icons.arrow_forward_ios_rounded,
                 size: 16.sp,
-                color: const Color(0xFFA1887F),
+                color: textColor.withValues(alpha: 0.5),
               ),
             ],
           ),

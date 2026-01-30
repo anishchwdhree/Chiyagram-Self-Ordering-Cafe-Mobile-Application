@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:chiyagaram/responsive/size_config.dart';
+import 'package:chiyagaram/theme/app_colors.dart';
+import 'package:chiyagaram/theme/theme_provider.dart';
+import 'package:provider/provider.dart';
 
 class EditProfile extends StatefulWidget {
   const EditProfile({super.key});
@@ -20,24 +23,34 @@ class _EditProfileState extends State<EditProfile> {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDark = themeProvider.isDarkMode;
+    final textColor = isDark ? Colors.white : const Color(0xFF3E2723);
+
     return Scaffold(
       body: Stack(
         children: [
           // Background Gradient
-          const RepaintBoundary(
+          RepaintBoundary(
             child: DecoratedBox(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: [
-                    Color(0xFFFFF3E0),
-                    Color(0xFFFFECB3),
-                    Color(0xFFFBE9E7),
-                  ],
+                  colors: isDark
+                      ? [
+                          AppColors.igBlack,
+                          AppColors.igDarkGrey,
+                          AppColors.igBlack,
+                        ]
+                      : [
+                          const Color(0xFFFFF3E0),
+                          const Color(0xFFFFECB3),
+                          const Color(0xFFFBE9E7),
+                        ],
                 ),
               ),
-              child: SizedBox.expand(),
+              child: const SizedBox.expand(),
             ),
           ),
           SafeArea(
@@ -51,10 +64,7 @@ class _EditProfileState extends State<EditProfile> {
                     children: [
                       IconButton(
                         onPressed: () => Navigator.pop(context),
-                        icon: const Icon(
-                          Icons.arrow_back_ios_new,
-                          color: Color(0xFF3E2723),
-                        ),
+                        icon: Icon(Icons.arrow_back_ios_new, color: textColor),
                       ),
                       Expanded(
                         child: Text(
@@ -63,7 +73,7 @@ class _EditProfileState extends State<EditProfile> {
                           style: GoogleFonts.philosopher(
                             fontSize: 20.sp,
                             fontWeight: FontWeight.bold,
-                            color: const Color(0xFF3E2723),
+                            color: textColor,
                           ),
                         ),
                       ),
@@ -81,14 +91,15 @@ class _EditProfileState extends State<EditProfile> {
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           border: Border.all(
-                            color: const Color(
-                              0xFF3E2723,
-                            ).withValues(alpha: 0.1),
+                            color: textColor.withValues(alpha: 0.1),
                             width: 2.w,
                           ),
                         ),
                         child: CircleAvatar(
                           radius: 60.w,
+                          backgroundColor: isDark
+                              ? AppColors.igSurface
+                              : Colors.white,
                           backgroundImage: const AssetImage(
                             "images/profile.png",
                           ),
@@ -97,13 +108,18 @@ class _EditProfileState extends State<EditProfile> {
                       Container(
                         padding: EdgeInsets.all(8.w),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF3E2723),
+                          color: isDark
+                              ? Colors.white
+                              : const Color(0xFF3E2723),
                           shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white, width: 2.w),
+                          border: Border.all(
+                            color: isDark ? Colors.black : Colors.white,
+                            width: 2.w,
+                          ),
                         ),
                         child: Icon(
                           Iconsax.camera,
-                          color: Colors.white,
+                          color: isDark ? Colors.black : Colors.white,
                           size: 20.sp,
                         ),
                       ),
@@ -117,6 +133,8 @@ class _EditProfileState extends State<EditProfile> {
                     "Anish Chaudhary",
                     Iconsax.user,
                     _nameController,
+                    isDark,
+                    textColor,
                   ),
                   SizedBox(height: 20.h),
                   _buildTextField(
@@ -124,6 +142,8 @@ class _EditProfileState extends State<EditProfile> {
                     "anish@example.com",
                     Iconsax.sms,
                     _emailController,
+                    isDark,
+                    textColor,
                   ),
 
                   SizedBox(height: 50.h),
@@ -136,22 +156,24 @@ class _EditProfileState extends State<EditProfile> {
                         Navigator.pop(context);
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF3E2723),
+                        backgroundColor: isDark
+                            ? Colors.white
+                            : const Color(0xFF3E2723),
                         padding: EdgeInsets.symmetric(vertical: 16.h),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30.w),
                         ),
                         elevation: 5,
-                        shadowColor: const Color(
-                          0xFF3E2723,
-                        ).withValues(alpha: 0.3),
+                        shadowColor:
+                            (isDark ? Colors.black : const Color(0xFF3E2723))
+                                .withValues(alpha: 0.3),
                       ),
                       child: Text(
                         "Save Changes",
                         style: GoogleFonts.outfit(
                           fontSize: 16.sp,
                           fontWeight: FontWeight.w600,
-                          color: Colors.white,
+                          color: isDark ? Colors.black : Colors.white,
                         ),
                       ),
                     ),
@@ -171,6 +193,8 @@ class _EditProfileState extends State<EditProfile> {
     String placeholder,
     IconData icon,
     TextEditingController controller,
+    bool isDark,
+    Color textColor,
   ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -180,7 +204,7 @@ class _EditProfileState extends State<EditProfile> {
           style: GoogleFonts.outfit(
             fontSize: 14.sp,
             fontWeight: FontWeight.w500,
-            color: const Color(0xFF3E2723).withValues(alpha: 0.7),
+            color: textColor.withValues(alpha: 0.7),
           ),
         ),
         SizedBox(height: 8.h),
@@ -188,22 +212,24 @@ class _EditProfileState extends State<EditProfile> {
           controller: controller,
           style: GoogleFonts.outfit(
             fontSize: 16.sp,
-            color: const Color(0xFF3E2723),
+            color: textColor,
             fontWeight: FontWeight.w500,
           ),
           decoration: InputDecoration(
             hintText: placeholder,
             hintStyle: GoogleFonts.outfit(
               fontSize: 16.sp,
-              color: const Color(0xFF3E2723).withValues(alpha: 0.4),
+              color: textColor.withValues(alpha: 0.4),
             ),
             prefixIcon: Icon(
               icon,
-              color: const Color(0xFF3E2723).withValues(alpha: 0.6),
+              color: textColor.withValues(alpha: 0.6),
               size: 22.sp,
             ),
             filled: true,
-            fillColor: Colors.white.withValues(alpha: 0.6),
+            fillColor: isDark
+                ? AppColors.igSurface
+                : Colors.white.withValues(alpha: 0.6),
             contentPadding: EdgeInsets.symmetric(
               vertical: 16.h,
               horizontal: 20.w,
@@ -215,14 +241,16 @@ class _EditProfileState extends State<EditProfile> {
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16.w),
               borderSide: BorderSide(
-                color: Colors.white.withValues(alpha: 0.5),
+                color: isDark
+                    ? AppColors.igBorder
+                    : Colors.white.withValues(alpha: 0.5),
                 width: 1.w,
               ),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16.w),
               borderSide: BorderSide(
-                color: const Color(0xFF3E2723).withValues(alpha: 0.2),
+                color: textColor.withValues(alpha: 0.2),
                 width: 1.w,
               ),
             ),

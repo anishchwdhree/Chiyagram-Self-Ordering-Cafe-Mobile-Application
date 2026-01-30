@@ -6,13 +6,15 @@ import 'package:chiyagaram/bottom%20bar%20screens/bottom_navbar.dart';
 import 'package:chiyagaram/responsive/size_config.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:chiyagaram/screens/widget/hero_carousel.dart';
+import 'package:chiyagaram/screens/widget/popular_section.dart';
 import 'package:chiyagaram/screens/widget/recommendation_section.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:provider/provider.dart';
 
 import 'package:chiyagaram/bottom%20bar%20screens/cart_screen.dart';
 import 'package:chiyagaram/screens/notification_screen.dart';
-import 'package:chiyagaram/menu/menu_screen.dart'; // [NEW] Imported for future use
+import 'package:chiyagaram/menu/menu_screen.dart';
+import 'package:chiyagaram/profile/profile_screen.dart';
 
 class SecondHomescreen extends StatefulWidget {
   const SecondHomescreen({super.key});
@@ -61,10 +63,10 @@ class _SecondHomescreenState extends State<SecondHomescreen> {
             controller: _pageController,
             onPageChanged: _onPageChanged,
             physics: const BouncingScrollPhysics(),
-            children: const [
-              HomeTab(),
-              MenuScreen(), // Index 1
-              CartScreen(), // Index 2
+            children: [
+              const HomeTab(),
+              const MenuScreen(), // Index 1
+              const CartScreen(), // Index 2
               // LocationsScreen(), // Index 3
               ProfileScreen(), // Index 3 (was 4)
             ],
@@ -110,7 +112,7 @@ class _HomeTabState extends State<HomeTab> {
               right: -50.w,
               child: BackgroundCircle(
                 size: 200.w,
-                color: isDark ? const Color(0xFF4E342E) : const Color(0xFFFFCCBC),
+                color: isDark ? AppColors.igSurface : const Color(0xFFFFCCBC),
                 opacity: 0.4,
               ),
             ),
@@ -119,7 +121,7 @@ class _HomeTabState extends State<HomeTab> {
               left: -30.w,
               child: BackgroundCircle(
                 size: 140.w,
-                color: isDark ? const Color(0xFF5D4037) : const Color(0xFFFFE0B2),
+                color: isDark ? AppColors.igDarkGrey : const Color(0xFFFFE0B2),
                 opacity: 0.3,
               ),
             ),
@@ -128,7 +130,7 @@ class _HomeTabState extends State<HomeTab> {
               right: 0,
               child: BackgroundCircle(
                 size: 120.w,
-                color: isDark ? const Color(0xFF3E2723) : const Color(0xFFD7CCC8),
+                color: isDark ? AppColors.igBlack : const Color(0xFFD7CCC8),
                 opacity: 0.2,
               ),
             ),
@@ -169,7 +171,11 @@ class _HomeTabState extends State<HomeTab> {
                           textAlign: TextAlign.left,
                           style: GoogleFonts.outfit(
                             fontSize: 10.sp,
-                            color: isDark ? Colors.white70 : const Color(0xFF795548).withOpacity(0.6),
+                            color: isDark
+                                ? AppColors.igTextSecondary
+                                : const Color(
+                                    0xFF795548,
+                                  ).withValues(alpha: 0.6),
                             fontWeight: FontWeight.w500,
                             letterSpacing: 0.8,
                           ),
@@ -180,7 +186,9 @@ class _HomeTabState extends State<HomeTab> {
                   SizedBox(height: 40.h),
                   const HeroCarousel(),
                   const SizedBox(height: 30),
-                  const RecommendationSection(),
+                  RecommendationSection(isDark: isDark),
+                  SizedBox(height: 10.h),
+                  PopularSection(isDark: isDark),
                   SizedBox(height: 40.h),
                 ],
               ),

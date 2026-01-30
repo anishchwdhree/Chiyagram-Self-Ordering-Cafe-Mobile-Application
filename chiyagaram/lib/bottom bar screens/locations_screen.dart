@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:chiyagaram/responsive/size_config.dart';
+import 'package:chiyagaram/theme/app_colors.dart';
+import 'package:chiyagaram/theme/theme_provider.dart';
+import 'package:provider/provider.dart';
 
 class LocationsScreen extends StatefulWidget {
   const LocationsScreen({super.key});
@@ -16,24 +19,38 @@ class _LocationsScreenState extends State<LocationsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDark = themeProvider.isDarkMode;
+    final textColor = isDark ? Colors.white : const Color(0xFF3E2723);
+    final subTextColor = isDark ? Colors.white70 : const Color(0xFF795548);
+    final containerColor = isDark
+        ? AppColors.igSurface.withValues(alpha: 0.6)
+        : Colors.white.withValues(alpha: 0.5);
+
     return Stack(
       children: [
         // ... (Background sections remain unchanged)
         // 1. Background Gradient
-        const RepaintBoundary(
+        RepaintBoundary(
           child: DecoratedBox(
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [
-                  Color(0xFFFFF3E0),
-                  Color(0xFFFFECB3),
-                  Color(0xFFFBE9E7),
-                ],
+                colors: isDark
+                    ? [
+                        AppColors.igBlack,
+                        AppColors.igDarkGrey,
+                        AppColors.igBlack,
+                      ]
+                    : [
+                        const Color(0xFFFFF3E0),
+                        const Color(0xFFFFECB3),
+                        const Color(0xFFFBE9E7),
+                      ],
               ),
             ),
-            child: SizedBox.expand(),
+            child: const SizedBox.expand(),
           ),
         ),
 
@@ -45,7 +62,7 @@ class _LocationsScreenState extends State<LocationsScreen> {
               right: -50.w,
               child: _buildBackgroundCircle(
                 200.w,
-                const Color(0xFFFFCCBC),
+                isDark ? AppColors.igSurface : const Color(0xFFFFCCBC),
                 0.4,
               ),
             ),
@@ -54,7 +71,7 @@ class _LocationsScreenState extends State<LocationsScreen> {
               left: -30.w,
               child: _buildBackgroundCircle(
                 140.w,
-                const Color(0xFFFFE0B2),
+                isDark ? AppColors.igDarkGrey : const Color(0xFFFFE0B2),
                 0.3,
               ),
             ),
@@ -76,7 +93,7 @@ class _LocationsScreenState extends State<LocationsScreen> {
                       style: GoogleFonts.philosopher(
                         fontSize: 25.sp,
                         fontWeight: FontWeight.bold,
-                        color: const Color(0xFF3E2723),
+                        color: textColor,
                       ),
                     ),
                     SizedBox(height: 5.h),
@@ -84,7 +101,7 @@ class _LocationsScreenState extends State<LocationsScreen> {
                       "Discover our story and find us nearby",
                       style: GoogleFonts.outfit(
                         fontSize: 16.sp,
-                        color: const Color(0xFF795548),
+                        color: subTextColor,
                       ),
                     ),
                   ],
@@ -125,10 +142,10 @@ class _LocationsScreenState extends State<LocationsScreen> {
                     Container(
                       padding: EdgeInsets.all(20.w),
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.5),
+                        color: containerColor,
                         borderRadius: BorderRadius.circular(20.w),
                         border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.3),
+                          color: textColor.withValues(alpha: 0.1),
                         ),
                       ),
                       child: Column(
@@ -139,7 +156,7 @@ class _LocationsScreenState extends State<LocationsScreen> {
                             style: GoogleFonts.philosopher(
                               fontSize: 22.sp,
                               fontWeight: FontWeight.bold,
-                              color: const Color(0xFF3E2723),
+                              color: textColor,
                             ),
                           ),
                           SizedBox(height: 15.h),
@@ -152,7 +169,7 @@ class _LocationsScreenState extends State<LocationsScreen> {
                                 : TextOverflow.ellipsis,
                             style: GoogleFonts.outfit(
                               fontSize: 15.sp,
-                              color: const Color(0xFF4E342E),
+                              color: textColor.withValues(alpha: 0.8),
                               height: 1.6,
                             ),
                           ),
@@ -168,7 +185,7 @@ class _LocationsScreenState extends State<LocationsScreen> {
                               style: GoogleFonts.outfit(
                                 fontSize: 14.sp,
                                 fontWeight: FontWeight.bold,
-                                color: const Color(0xFF795548),
+                                color: subTextColor,
                                 decoration: TextDecoration.underline,
                               ),
                             ),
@@ -183,10 +200,10 @@ class _LocationsScreenState extends State<LocationsScreen> {
                     Container(
                       padding: EdgeInsets.all(20.w),
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.5),
+                        color: containerColor,
                         borderRadius: BorderRadius.circular(20.w),
                         border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.3),
+                          color: textColor.withValues(alpha: 0.1),
                         ),
                       ),
                       child: Column(
@@ -197,7 +214,7 @@ class _LocationsScreenState extends State<LocationsScreen> {
                             style: GoogleFonts.philosopher(
                               fontSize: 22.sp,
                               fontWeight: FontWeight.bold,
-                              color: const Color(0xFF3E2723),
+                              color: textColor,
                             ),
                           ),
                           SizedBox(height: 15.h),
@@ -210,7 +227,7 @@ class _LocationsScreenState extends State<LocationsScreen> {
                                 : TextOverflow.ellipsis,
                             style: GoogleFonts.outfit(
                               fontSize: 15.sp,
-                              color: const Color(0xFF4E342E),
+                              color: textColor.withValues(alpha: 0.8),
                               height: 1.6,
                             ),
                           ),
@@ -226,7 +243,7 @@ class _LocationsScreenState extends State<LocationsScreen> {
                               style: GoogleFonts.outfit(
                                 fontSize: 14.sp,
                                 fontWeight: FontWeight.bold,
-                                color: const Color(0xFF795548),
+                                color: subTextColor,
                                 decoration: TextDecoration.underline,
                               ),
                             ),

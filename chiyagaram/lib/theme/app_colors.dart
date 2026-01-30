@@ -15,14 +15,26 @@ class AppColors {
   static const Color backgroundGradientEnd = Color(0xFFFBE9E7);
 
   // ========== BACKGROUND GRADIENTS (DARK) ==========
-  static const Color darkBgStart = Color(0xFF2D1B18);
-  static const Color darkBgMiddle = Color(0xFF3E2723);
-  static const Color darkBgEnd = Color(0xFF1A1210);
+  static const Color darkBgStart = Color(0xFF000000); // Instagram Black
+  static const Color darkBgMiddle = Color(0xFF121212); // Secondary Dark
+  static const Color darkBgEnd = Color(0xFF000000); // Bottom Black
+
+  // ========== INSTAGRAM NEUTRAL PALETTE ==========
+  static const Color igBlack = Color(0xFF000000);
+  static const Color igDarkGrey = Color(0xFF121212);
+  static const Color igSurface = Color(0xFF262626);
+  static const Color igBorder = Color(0xFF363636);
+  static const Color igTextPrimary = Color(0xFFFFFFFF);
+  static const Color igTextSecondary = Color(0xFFA8A8A8);
 
   static List<Color> getBackgroundGradient(bool isDark) {
     return isDark
         ? [darkBgStart, darkBgMiddle, darkBgEnd]
-        : [backgroundGradientStart, backgroundGradientMiddle, backgroundGradientEnd];
+        : [
+            backgroundGradientStart,
+            backgroundGradientMiddle,
+            backgroundGradientEnd,
+          ];
   }
 
   // ========== BROWN PALETTE EXTENSIONS ==========

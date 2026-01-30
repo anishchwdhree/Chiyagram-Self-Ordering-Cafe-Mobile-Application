@@ -65,7 +65,7 @@ class AppTheme {
       // Input Decoration Theme
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: AppColors.white.withOpacity(0.5),
+        fillColor: AppColors.white.withValues(alpha: 0.5),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(color: AppColors.grey300),
@@ -110,16 +110,16 @@ class AppTheme {
       colorScheme: ColorScheme.fromSeed(
         seedColor: AppColors.primary,
         brightness: Brightness.dark,
-        primary: AppColors.secondary, // Lighter brown for dark mode
-        secondary: AppColors.mediumBrown,
-        surface: AppColors.deepBrown,
+        primary: AppColors.white, // High contrast
+        secondary: AppColors.igTextSecondary,
+        surface: AppColors.igBlack,
         error: AppColors.errorRed,
-        onPrimary: AppColors.white,
-        onSecondary: AppColors.white,
-        onSurface: AppColors.white,
+        onPrimary: AppColors.igBlack,
+        onSecondary: AppColors.igBlack,
+        onSurface: AppColors.igTextPrimary,
         onError: AppColors.white,
       ),
-      scaffoldBackgroundColor: AppColors.darkBgMiddle,
+      scaffoldBackgroundColor: AppColors.igBlack,
 
       // Text Theme
       textTheme: GoogleFonts.outfitTextTheme().apply(
@@ -129,7 +129,7 @@ class AppTheme {
 
       // App Bar Theme
       appBarTheme: AppBarTheme(
-        backgroundColor: AppColors.deepBrown,
+        backgroundColor: AppColors.igBlack,
         elevation: 0,
         centerTitle: true,
         iconTheme: const IconThemeData(color: AppColors.white),
@@ -158,8 +158,8 @@ class AppTheme {
 
       // Card Theme
       cardTheme: const CardThemeData(
-        color: AppColors.darkBrown,
-        elevation: 2,
+        color: AppColors.igDarkGrey,
+        elevation: 0, // Instagram uses flat cards with subtle borders
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(16)),
         ),
@@ -167,18 +167,18 @@ class AppTheme {
       // Input Decoration Theme
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: AppColors.darkBrown,
+        fillColor: AppColors.igSurface,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: AppColors.mediumBrown),
+          borderSide: BorderSide(color: AppColors.igBorder),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: AppColors.mediumBrown),
+          borderSide: BorderSide(color: AppColors.igBorder),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: AppColors.secondary, width: 2),
+          borderSide: const BorderSide(color: AppColors.white, width: 1.5),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),

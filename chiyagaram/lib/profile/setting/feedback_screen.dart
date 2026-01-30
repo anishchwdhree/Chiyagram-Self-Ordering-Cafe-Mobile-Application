@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:chiyagaram/responsive/size_config.dart';
+import 'package:chiyagaram/theme/app_colors.dart';
+import 'package:chiyagaram/theme/theme_provider.dart';
+import 'package:provider/provider.dart';
 
 class FeedbackScreen extends StatefulWidget {
   const FeedbackScreen({super.key});
@@ -15,24 +18,34 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDark = themeProvider.isDarkMode;
+    final textColor = isDark ? Colors.white : const Color(0xFF3E2723);
+
     return Scaffold(
       body: Stack(
         children: [
           // Background Gradient
-          const RepaintBoundary(
+          RepaintBoundary(
             child: DecoratedBox(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: [
-                    Color(0xFFFFF3E0),
-                    Color(0xFFFFECB3),
-                    Color(0xFFFBE9E7),
-                  ],
+                  colors: isDark
+                      ? [
+                          AppColors.igBlack,
+                          AppColors.igDarkGrey,
+                          AppColors.igBlack,
+                        ]
+                      : [
+                          const Color(0xFFFFF3E0),
+                          const Color(0xFFFFECB3),
+                          const Color(0xFFFBE9E7),
+                        ],
                 ),
               ),
-              child: SizedBox.expand(),
+              child: const SizedBox.expand(),
             ),
           ),
           SafeArea(
@@ -45,10 +58,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                     children: [
                       IconButton(
                         onPressed: () => Navigator.pop(context),
-                        icon: const Icon(
-                          Icons.arrow_back_ios_new,
-                          color: Color(0xFF3E2723),
-                        ),
+                        icon: Icon(Icons.arrow_back_ios_new, color: textColor),
                       ),
                       Expanded(
                         child: Text(
@@ -57,7 +67,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                           style: GoogleFonts.philosopher(
                             fontSize: 20.sp,
                             fontWeight: FontWeight.bold,
-                            color: const Color(0xFF3E2723),
+                            color: textColor,
                           ),
                         ),
                       ),
@@ -70,7 +80,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                     style: GoogleFonts.outfit(
                       fontSize: 18.sp,
                       fontWeight: FontWeight.w600,
-                      color: const Color(0xFF3E2723),
+                      color: textColor,
                     ),
                   ),
                   SizedBox(height: 20.h),
@@ -99,19 +109,29 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                     maxLines: 5,
                     style: GoogleFonts.outfit(
                       fontSize: 16.sp,
-                      color: const Color(0xFF3E2723),
+                      color: textColor,
                     ),
                     decoration: InputDecoration(
                       hintText: "Write your feedback here...",
                       hintStyle: GoogleFonts.outfit(
                         fontSize: 16.sp,
-                        color: const Color(0xFF3E2723).withValues(alpha: 0.4),
+                        color: textColor.withValues(alpha: 0.4),
                       ),
                       filled: true,
-                      fillColor: Colors.white.withValues(alpha: 0.6),
+                      fillColor: isDark
+                          ? AppColors.igSurface
+                          : Colors.white.withValues(alpha: 0.6),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16.w),
-                        borderSide: BorderSide.none,
+                        borderSide: isDark
+                            ? const BorderSide(color: AppColors.igBorder)
+                            : BorderSide.none,
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16.w),
+                        borderSide: isDark
+                            ? const BorderSide(color: AppColors.igBorder)
+                            : BorderSide.none,
                       ),
                     ),
                   ),
@@ -128,12 +148,16 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                               "Thank you for your feedback!",
                               style: GoogleFonts.outfit(),
                             ),
-                            backgroundColor: const Color(0xFF3E2723),
+                            backgroundColor: isDark
+                                ? AppColors.igSurface
+                                : const Color(0xFF3E2723),
                           ),
                         );
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF3E2723),
+                        backgroundColor: isDark
+                            ? Colors.white
+                            : const Color(0xFF3E2723),
                         padding: EdgeInsets.symmetric(vertical: 16.h),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16.w),
@@ -145,7 +169,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                         style: GoogleFonts.outfit(
                           fontSize: 16.sp,
                           fontWeight: FontWeight.w600,
-                          color: Colors.white,
+                          color: isDark ? Colors.black : Colors.white,
                         ),
                       ),
                     ),

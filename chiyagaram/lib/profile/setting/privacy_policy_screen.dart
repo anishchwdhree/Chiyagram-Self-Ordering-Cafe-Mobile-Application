@@ -1,30 +1,43 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:chiyagaram/responsive/size_config.dart';
+import 'package:chiyagaram/theme/app_colors.dart';
+import 'package:chiyagaram/theme/theme_provider.dart';
+import 'package:provider/provider.dart';
 
 class PrivacyPolicyScreen extends StatelessWidget {
   const PrivacyPolicyScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDark = themeProvider.isDarkMode;
+    final textColor = isDark ? Colors.white : const Color(0xFF3E2723);
+
     return Scaffold(
       body: Stack(
         children: [
           // Background Gradient
-          const RepaintBoundary(
+          RepaintBoundary(
             child: DecoratedBox(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: [
-                    Color(0xFFFFF3E0),
-                    Color(0xFFFFECB3),
-                    Color(0xFFFBE9E7),
-                  ],
+                  colors: isDark
+                      ? [
+                          AppColors.igBlack,
+                          AppColors.igDarkGrey,
+                          AppColors.igBlack,
+                        ]
+                      : [
+                          const Color(0xFFFFF3E0),
+                          const Color(0xFFFFECB3),
+                          const Color(0xFFFBE9E7),
+                        ],
                 ),
               ),
-              child: SizedBox.expand(),
+              child: const SizedBox.expand(),
             ),
           ),
           SafeArea(
@@ -37,10 +50,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
                     children: [
                       IconButton(
                         onPressed: () => Navigator.pop(context),
-                        icon: const Icon(
-                          Icons.arrow_back_ios_new,
-                          color: Color(0xFF3E2723),
-                        ),
+                        icon: Icon(Icons.arrow_back_ios_new, color: textColor),
                       ),
                       Expanded(
                         child: Text(
@@ -49,7 +59,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
                           style: GoogleFonts.philosopher(
                             fontSize: 20.sp,
                             fontWeight: FontWeight.bold,
-                            color: const Color(0xFF3E2723),
+                            color: textColor,
                           ),
                         ),
                       ),
@@ -61,7 +71,9 @@ class PrivacyPolicyScreen extends StatelessWidget {
                     "Last Updated: January 2026",
                     style: GoogleFonts.outfit(
                       fontSize: 14.sp,
-                      color: const Color(0xFF795548),
+                      color: isDark
+                          ? AppColors.igTextSecondary
+                          : const Color(0xFF795548),
                       fontStyle: FontStyle.italic,
                     ),
                   ),
@@ -69,22 +81,32 @@ class PrivacyPolicyScreen extends StatelessWidget {
                   _buildSection(
                     "1. Information We Collect",
                     "We collect information you provide directly to us, such as when you create an account, update your profile, or place an order. This includes your name, email address, phone number, and payment information.",
+                    isDark,
+                    textColor,
                   ),
                   _buildSection(
                     "2. How We Use Your Information",
                     "We use the information we collect to provide, maintain, and improve our services, process your orders, communicate with you, and personalize your experience.",
+                    isDark,
+                    textColor,
                   ),
                   _buildSection(
                     "3. Data Security",
                     "We implement reasonable security measures to protect your personal information. However, please be aware that no method of transmission over the internet or electronic storage is 100% secure.",
+                    isDark,
+                    textColor,
                   ),
                   _buildSection(
                     "4. Your Rights",
                     "You have the right to access, correct, or delete your personal information. You can manage your account settings within the app or contact us for assistance.",
+                    isDark,
+                    textColor,
                   ),
                   _buildSection(
                     "5. Contact Us",
                     "If you have any questions about this Privacy Policy, please contact us at support@chiyagram.com.",
+                    isDark,
+                    textColor,
                   ),
                   SizedBox(height: 40.h),
                 ],
@@ -96,7 +118,12 @@ class PrivacyPolicyScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSection(String title, String content) {
+  Widget _buildSection(
+    String title,
+    String content,
+    bool isDark,
+    Color textColor,
+  ) {
     return Padding(
       padding: EdgeInsets.only(bottom: 24.h),
       child: Column(
@@ -107,7 +134,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
             style: GoogleFonts.outfit(
               fontSize: 18.sp,
               fontWeight: FontWeight.bold,
-              color: const Color(0xFF3E2723),
+              color: textColor,
             ),
           ),
           SizedBox(height: 8.h),
@@ -115,7 +142,9 @@ class PrivacyPolicyScreen extends StatelessWidget {
             content,
             style: GoogleFonts.outfit(
               fontSize: 16.sp,
-              color: const Color(0xFF5D4037),
+              color: isDark
+                  ? AppColors.igTextSecondary
+                  : const Color(0xFF5D4037),
               height: 1.6,
             ),
           ),

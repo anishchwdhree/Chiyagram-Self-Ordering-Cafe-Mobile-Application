@@ -2,22 +2,26 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:chiyagaram/responsive/size_config.dart';
+import 'package:chiyagaram/theme/app_colors.dart';
+import 'package:chiyagaram/theme/theme_provider.dart';
+import 'package:provider/provider.dart';
 
 class MyOrdersScreen extends StatelessWidget {
   const MyOrdersScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDark = themeProvider.isDarkMode;
+    final textColor = isDark ? Colors.white : const Color(0xFF3E2723);
+
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_ios_new_rounded,
-            color: Color(0xFF3E2723),
-          ),
+          icon: Icon(Icons.arrow_back_ios_new_rounded, color: textColor),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
@@ -25,7 +29,7 @@ class MyOrdersScreen extends StatelessWidget {
           style: GoogleFonts.philosopher(
             fontSize: 24.sp,
             fontWeight: FontWeight.bold,
-            color: const Color(0xFF3E2723),
+            color: textColor,
           ),
         ),
         centerTitle: true,
@@ -33,20 +37,26 @@ class MyOrdersScreen extends StatelessWidget {
       body: Stack(
         children: [
           // Background Gradient
-          const RepaintBoundary(
+          RepaintBoundary(
             child: DecoratedBox(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: [
-                    Color(0xFFFFF3E0),
-                    Color(0xFFFFECB3),
-                    Color(0xFFFBE9E7),
-                  ],
+                  colors: isDark
+                      ? [
+                          AppColors.igBlack,
+                          AppColors.igDarkGrey,
+                          AppColors.igBlack,
+                        ]
+                      : [
+                          const Color(0xFFFFF3E0),
+                          const Color(0xFFFFECB3),
+                          const Color(0xFFFBE9E7),
+                        ],
                 ),
               ),
-              child: SizedBox.expand(),
+              child: const SizedBox.expand(),
             ),
           ),
           SafeArea(
@@ -54,7 +64,7 @@ class MyOrdersScreen extends StatelessWidget {
               padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
               itemCount: 5, // Dummy data count
               itemBuilder: (context, index) {
-                return _buildOrderCard(index);
+                return _buildOrderCard(index, isDark, textColor);
               },
             ),
           ),
@@ -63,7 +73,7 @@ class MyOrdersScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildOrderCard(int index) {
+  Widget _buildOrderCard(int index, bool isDark, Color textColor) {
     // Dummy Data
     final orderIds = [
       "#ORD-005",
@@ -114,12 +124,19 @@ class MyOrdersScreen extends StatelessWidget {
       margin: EdgeInsets.only(bottom: 16.h),
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.6),
+        color: isDark
+            ? AppColors.igSurface
+            : Colors.white.withValues(alpha: 0.6),
         borderRadius: BorderRadius.circular(20.w),
-        border: Border.all(color: Colors.white, width: 1.w),
+        border: Border.all(
+          color: isDark ? AppColors.igBorder : Colors.white,
+          width: 1.w,
+        ),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF3E2723).withValues(alpha: 0.05),
+            color: (isDark ? Colors.black : const Color(0xFF3E2723)).withValues(
+              alpha: 0.05,
+            ),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -136,7 +153,7 @@ class MyOrdersScreen extends StatelessWidget {
                 style: GoogleFonts.outfit(
                   fontSize: 16.sp,
                   fontWeight: FontWeight.bold,
-                  color: const Color(0xFF3E2723),
+                  color: textColor,
                 ),
               ),
               Container(
@@ -162,13 +179,15 @@ class MyOrdersScreen extends StatelessWidget {
             items[index],
             style: GoogleFonts.outfit(
               fontSize: 14.sp,
-              color: const Color(0xFF5D4037),
+              color: isDark
+                  ? AppColors.igTextSecondary
+                  : const Color(0xFF5D4037),
             ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
           SizedBox(height: 12.h),
-          Divider(color: const Color(0xFF3E2723).withValues(alpha: 0.1)),
+          Divider(color: textColor.withValues(alpha: 0.1)),
           SizedBox(height: 8.h),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -178,14 +197,18 @@ class MyOrdersScreen extends StatelessWidget {
                   Icon(
                     Iconsax.calendar_1,
                     size: 16.sp,
-                    color: const Color(0xFF795548),
+                    color: isDark
+                        ? AppColors.igTextSecondary
+                        : const Color(0xFF795548),
                   ),
                   SizedBox(width: 6.w),
                   Text(
                     dates[index],
                     style: GoogleFonts.outfit(
                       fontSize: 13.sp,
-                      color: const Color(0xFF795548),
+                      color: isDark
+                          ? AppColors.igTextSecondary
+                          : const Color(0xFF795548),
                     ),
                   ),
                 ],
@@ -195,7 +218,7 @@ class MyOrdersScreen extends StatelessWidget {
                 style: GoogleFonts.outfit(
                   fontSize: 16.sp,
                   fontWeight: FontWeight.bold,
-                  color: const Color(0xFF3E2723),
+                  color: textColor,
                 ),
               ),
             ],

@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:chiyagaram/responsive/size_config.dart';
+import 'package:chiyagaram/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -62,7 +63,8 @@ final List<RecommendationItem> recommendations = [
 
 // Recommendation Section Widget
 class RecommendationSection extends StatelessWidget {
-  const RecommendationSection({super.key});
+  final bool isDark;
+  const RecommendationSection({super.key, required this.isDark});
 
   @override
   Widget build(BuildContext context) {
@@ -78,7 +80,7 @@ class RecommendationSection extends StatelessWidget {
                 style: GoogleFonts.philosopher(
                   fontSize: 20.sp,
                   fontWeight: FontWeight.w700,
-                  color: const Color(0xFF4E342E),
+                  color: isDark ? Colors.white : const Color(0xFF4E342E),
                 ),
               ),
               const Spacer(),
@@ -88,8 +90,10 @@ class RecommendationSection extends StatelessWidget {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      const Color(0xFF8D6E63).withValues(alpha: 0.4),
-                      const Color(0xFF8D6E63).withValues(alpha: 0),
+                      (isDark ? Colors.white : const Color(0xFF8D6E63))
+                          .withValues(alpha: 0.4),
+                      (isDark ? Colors.white : const Color(0xFF8D6E63))
+                          .withValues(alpha: 0),
                     ],
                   ),
                 ),
@@ -112,7 +116,10 @@ class RecommendationSection extends StatelessWidget {
           ),
           itemCount: recommendations.length,
           itemBuilder: (context, index, realIndex) {
-            return RecommendationCard(item: recommendations[index]);
+            return RecommendationCard(
+              item: recommendations[index],
+              isDark: isDark,
+            );
           },
         ),
       ],
@@ -123,8 +130,13 @@ class RecommendationSection extends StatelessWidget {
 // Recommendation Card Widget
 class RecommendationCard extends StatelessWidget {
   final RecommendationItem item;
+  final bool isDark;
 
-  const RecommendationCard({super.key, required this.item});
+  const RecommendationCard({
+    super.key,
+    required this.item,
+    required this.isDark,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -132,15 +144,21 @@ class RecommendationCard extends StatelessWidget {
       width: 120.w,
       margin: EdgeInsets.only(right: 16.w),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.4),
+        color: isDark
+            ? AppColors.igSurface.withValues(alpha: 0.6)
+            : Colors.white.withValues(alpha: 0.4),
         borderRadius: BorderRadius.circular(24.w),
         border: Border.all(
-          color: Colors.white.withValues(alpha: 0.6),
+          color: isDark
+              ? AppColors.igBorder.withValues(alpha: 0.5)
+              : Colors.white.withValues(alpha: 0.6),
           width: 1.5.w,
         ),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF8D6E63).withValues(alpha: 0.1),
+            color: (isDark ? Colors.black : const Color(0xFF8D6E63)).withValues(
+              alpha: 0.1,
+            ),
             blurRadius: 20.w,
             offset: Offset(0, 8.h),
           ),
@@ -160,10 +178,13 @@ class RecommendationCard extends StatelessWidget {
                 height: 85.w,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Colors.white.withValues(alpha: 0.3),
+                  color: isDark
+                      ? Colors.white.withValues(alpha: 0.1)
+                      : Colors.white.withValues(alpha: 0.3),
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(0xFF5D4037).withValues(alpha: 0.1),
+                      color: (isDark ? Colors.black : const Color(0xFF5D4037))
+                          .withValues(alpha: 0.1),
                       blurRadius: 10.w,
                       offset: Offset(0, 4.h),
                     ),
@@ -200,7 +221,9 @@ class RecommendationCard extends StatelessWidget {
                             style: GoogleFonts.philosopher(
                               fontSize: 16.sp,
                               fontWeight: FontWeight.bold,
-                              color: const Color(0xFF3E2723),
+                              color: isDark
+                                  ? Colors.white
+                                  : const Color(0xFF3E2723),
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -211,9 +234,11 @@ class RecommendationCard extends StatelessWidget {
                             textAlign: TextAlign.center,
                             style: GoogleFonts.outfit(
                               fontSize: 11.sp,
-                              color: const Color(
-                                0xFF795548,
-                              ).withValues(alpha: 0.8),
+                              color: isDark
+                                  ? AppColors.igTextSecondary
+                                  : const Color(
+                                      0xFF795548,
+                                    ).withValues(alpha: 0.8),
                               fontWeight: FontWeight.w400,
                             ),
                             maxLines: 1,

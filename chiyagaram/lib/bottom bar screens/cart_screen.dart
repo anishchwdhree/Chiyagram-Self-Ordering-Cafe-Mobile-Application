@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:chiyagaram/screens/widget/background_scaffold.dart';
 import 'package:chiyagaram/theme/theme_provider.dart';
 import 'package:chiyagaram/screens/checkout_screen.dart';
@@ -6,6 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:chiyagaram/models/cart_model.dart';
 import 'package:chiyagaram/responsive/size_config.dart';
+import 'package:chiyagaram/theme/app_colors.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:lottie/lottie.dart';
 import 'package:iconsax/iconsax.dart';
@@ -25,10 +27,7 @@ class CartScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        leading: IconButton(
-          onPressed: () => Navigator.pop(context),
-          icon: Icon(Icons.arrow_back_ios, color: textColor),
-        ),
+        automaticallyImplyLeading: false,
         title: Text(
           "My Order",
           style: GoogleFonts.philosopher(
@@ -50,10 +49,13 @@ class CartScreen extends StatelessWidget {
               height: 200.w,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: (isDark ? const Color(0xFF4E342E) : const Color(0xFFFFCCBC)).withValues(alpha: 0.4),
+                color: (isDark ? AppColors.igSurface : const Color(0xFFFFCCBC))
+                    .withValues(alpha: 0.4),
                 boxShadow: [
                   BoxShadow(
-                    color: (isDark ? const Color(0xFF4E342E) : const Color(0xFFFFCCBC)).withValues(alpha: 0.2),
+                    color:
+                        (isDark ? AppColors.igSurface : const Color(0xFFFFCCBC))
+                            .withValues(alpha: 0.2),
                     blurRadius: 50.w,
                     spreadRadius: 10.w,
                   ),
@@ -71,17 +73,31 @@ class CartScreen extends StatelessWidget {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Lottie.asset(
-                          'images/Cart.json',
-                          height: 250.h,
-                          fit: BoxFit.contain,
-                        ),
+                        isDark
+                            ? ColorFiltered(
+                                colorFilter: const ColorFilter.mode(
+                                  Colors.white,
+                                  BlendMode.srcIn,
+                                ),
+                                child: Lottie.asset(
+                                  'images/Cart.json',
+                                  height: 250.h,
+                                  fit: BoxFit.contain,
+                                ),
+                              )
+                            : Lottie.asset(
+                                'images/Cart.json',
+                                height: 250.h,
+                                fit: BoxFit.contain,
+                              ),
                         SizedBox(height: 16.h),
                         Text(
                           "Your cart is empty",
                           style: GoogleFonts.outfit(
                             fontSize: 18.sp,
-                            color: isDark ? Colors.white70 : const Color(0xFF8D6E63),
+                            color: isDark
+                                ? AppColors.igTextSecondary
+                                : const Color(0xFF8D6E63),
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -110,7 +126,13 @@ class CartScreen extends StatelessWidget {
                               child: SlideAnimation(
                                 verticalOffset: 50.h,
                                 child: FadeInAnimation(
-                                  child: _buildCartItem(context, item, cart, isDark, textColor),
+                                  child: _buildCartItem(
+                                    context,
+                                    item,
+                                    cart,
+                                    isDark,
+                                    textColor,
+                                  ),
                                 ),
                               ),
                             );
@@ -121,7 +143,12 @@ class CartScreen extends StatelessWidget {
                     // Total and Checkout
                     Padding(
                       padding: EdgeInsets.only(bottom: 100.w),
-                      child: _buildCheckoutSection(context, cart, isDark, textColor),
+                      child: _buildCheckoutSection(
+                        context,
+                        cart,
+                        isDark,
+                        textColor,
+                      ),
                     ),
                   ],
                 );
@@ -133,7 +160,13 @@ class CartScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildCartItem(BuildContext context, CartItem item, CartModel cart, bool isDark, Color textColor) {
+  Widget _buildCartItem(
+    BuildContext context,
+    CartItem item,
+    CartModel cart,
+    bool isDark,
+    Color textColor,
+  ) {
     return Container(
       margin: EdgeInsets.only(bottom: 8.w),
       child: Stack(
@@ -143,31 +176,33 @@ class CartScreen extends StatelessWidget {
           // Glassmorphic Card
           Container(
             margin: const EdgeInsets.only(left: 0),
-            constraints: BoxConstraints(
-              minHeight: 85.w,
-            ),
+            constraints: BoxConstraints(minHeight: 85.w),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(24.w),
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: isDark 
-                  ? [
-                      Colors.white.withValues(alpha: 0.1),
-                      Colors.white.withValues(alpha: 0.05),
-                    ]
-                  : [
-                      item.color1.withValues(alpha: 0.15),
-                      item.color2.withValues(alpha: 0.05),
-                    ],
+                colors: isDark
+                    ? [
+                        Colors.white.withValues(alpha: 0.1),
+                        Colors.white.withValues(alpha: 0.05),
+                      ]
+                    : [
+                        item.color1.withValues(alpha: 0.15),
+                        item.color2.withValues(alpha: 0.05),
+                      ],
               ),
               border: Border.all(
-                color: isDark ? Colors.white10 : Colors.white.withValues(alpha: 0.6),
+                color: isDark
+                    ? Colors.white10
+                    : Colors.white.withValues(alpha: 0.6),
                 width: 1.5.w,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: isDark ? Colors.black26 : item.color1.withValues(alpha: 0.1),
+                  color: isDark
+                      ? Colors.black26
+                      : item.color1.withValues(alpha: 0.1),
                   blurRadius: 20.w,
                   offset: Offset(0, 8.w),
                 ),
@@ -210,7 +245,9 @@ class CartScreen extends StatelessWidget {
                               child: Icon(
                                 Iconsax.trash,
                                 size: 20.sp,
-                                color: isDark ? Colors.redAccent : Colors.red[800],
+                                color: isDark
+                                    ? Colors.redAccent
+                                    : Colors.red[800],
                               ),
                             ),
                           ),
@@ -240,10 +277,14 @@ class CartScreen extends StatelessWidget {
                               vertical: 4.w,
                             ),
                             decoration: BoxDecoration(
-                              color: isDark ? Colors.white10 : Colors.white.withValues(alpha: 0.5),
+                              color: isDark
+                                  ? Colors.white10
+                                  : Colors.white.withValues(alpha: 0.5),
                               borderRadius: BorderRadius.circular(20.w),
                               border: Border.all(
-                                color: isDark ? Colors.white10 : Colors.white.withValues(alpha: 0.8),
+                                color: isDark
+                                    ? Colors.white10
+                                    : Colors.white.withValues(alpha: 0.8),
                               ),
                             ),
                             child: Row(
@@ -252,7 +293,9 @@ class CartScreen extends StatelessWidget {
                                 _buildQtyBtn(
                                   icon: Icons.remove,
                                   onTap: () => cart.removeSingleItem(item.id),
-                                  itemColor: isDark ? Colors.white : item.color1,
+                                  itemColor: isDark
+                                      ? Colors.white
+                                      : item.color1,
                                   size: 24.w,
                                   isDark: isDark,
                                 ),
@@ -278,7 +321,9 @@ class CartScreen extends StatelessWidget {
                                     color2: item.color2,
                                   ),
                                   isAdd: true,
-                                  itemColor: isDark ? Colors.white : item.color1,
+                                  itemColor: isDark
+                                      ? Colors.white
+                                      : item.color1,
                                   size: 24.w,
                                   isDark: isDark,
                                 ),
@@ -340,7 +385,9 @@ class CartScreen extends StatelessWidget {
         width: btnSize,
         height: btnSize,
         decoration: BoxDecoration(
-          color: isAdd ? (isDark ? Colors.white : itemColor) : (isDark ? Colors.transparent : Colors.white),
+          color: isAdd
+              ? (isDark ? Colors.white : itemColor)
+              : (isDark ? Colors.transparent : Colors.white),
           shape: BoxShape.circle,
           border: isDark && !isAdd ? Border.all(color: Colors.white24) : null,
           boxShadow: [
@@ -355,27 +402,29 @@ class CartScreen extends StatelessWidget {
         child: Icon(
           icon,
           size: (btnSize * 0.55),
-          color: isAdd 
-              ? (isDark ? Colors.black : Colors.white) 
+          color: isAdd
+              ? (isDark ? Colors.black : Colors.white)
               : (isDark ? Colors.white : itemColor),
         ),
       ),
     );
   }
 
-  Widget _buildCheckoutSection(BuildContext context, CartModel cart, bool isDark, Color textColor) {
+  Widget _buildCheckoutSection(
+    BuildContext context,
+    CartModel cart,
+    bool isDark,
+    Color textColor,
+  ) {
     return ClipRRect(
       borderRadius: BorderRadius.only(
         topLeft: Radius.circular(35.w),
         topRight: Radius.circular(35.w),
       ),
       child: Container(
-        padding: EdgeInsets.symmetric(
-          horizontal: 24.w,
-          vertical: 12.h,
-        ),
+        padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 12.h),
         decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF2D1B18) : const Color(0xFFFFF3E0),
+          color: isDark ? AppColors.igBlack : const Color(0xFFFFF3E0),
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(35.w),
             topRight: Radius.circular(35.w),
@@ -396,11 +445,17 @@ class CartScreen extends StatelessWidget {
               // Cost Breakdown
               _buildSummaryRow("Sub total", cart.subTotal, isDark, textColor),
               SizedBox(height: 6.h),
-              _buildSummaryRow("Serving Fee", cart.servingFee, isDark, textColor),
+              _buildSummaryRow(
+                "Serving Fee",
+                cart.servingFee,
+                isDark,
+                textColor,
+              ),
               SizedBox(height: 8.h),
               // Divider
               Divider(
-                color: (isDark ? Colors.white : const Color(0xFF5D4037)).withValues(alpha: 0.2),
+                color: (isDark ? AppColors.igBorder : const Color(0xFF5D4037))
+                    .withValues(alpha: 0.2),
                 thickness: 1,
               ),
               SizedBox(height: 8.h),
@@ -475,7 +530,12 @@ class CartScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSummaryRow(String label, double amount, bool isDark, Color textColor) {
+  Widget _buildSummaryRow(
+    String label,
+    double amount,
+    bool isDark,
+    Color textColor,
+  ) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -483,7 +543,9 @@ class CartScreen extends StatelessWidget {
           label,
           style: GoogleFonts.outfit(
             fontSize: 15.sp,
-            color: isDark ? Colors.white70 : const Color(0xFF5D4037).withValues(alpha: 0.8),
+            color: isDark
+                ? AppColors.igTextSecondary
+                : const Color(0xFF5D4037).withValues(alpha: 0.8),
             fontWeight: FontWeight.w500,
           ),
         ),

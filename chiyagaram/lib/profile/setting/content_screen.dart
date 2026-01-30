@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:chiyagaram/responsive/size_config.dart';
+import 'package:chiyagaram/theme/app_colors.dart';
+import 'package:chiyagaram/theme/theme_provider.dart';
+import 'package:provider/provider.dart';
 
 class ContentScreen extends StatelessWidget {
   final String title;
@@ -10,24 +13,34 @@ class ContentScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDark = themeProvider.isDarkMode;
+    final textColor = isDark ? Colors.white : const Color(0xFF3E2723);
+
     return Scaffold(
       body: Stack(
         children: [
           // Background Gradient
-          const RepaintBoundary(
+          RepaintBoundary(
             child: DecoratedBox(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: [
-                    Color(0xFFFFF3E0),
-                    Color(0xFFFFECB3),
-                    Color(0xFFFBE9E7),
-                  ],
+                  colors: isDark
+                      ? [
+                          AppColors.igBlack,
+                          AppColors.igDarkGrey,
+                          AppColors.igBlack,
+                        ]
+                      : [
+                          const Color(0xFFFFF3E0),
+                          const Color(0xFFFFECB3),
+                          const Color(0xFFFBE9E7),
+                        ],
                 ),
               ),
-              child: SizedBox.expand(),
+              child: const SizedBox.expand(),
             ),
           ),
           SafeArea(
@@ -40,10 +53,7 @@ class ContentScreen extends StatelessWidget {
                     children: [
                       IconButton(
                         onPressed: () => Navigator.pop(context),
-                        icon: const Icon(
-                          Icons.arrow_back_ios_new,
-                          color: Color(0xFF3E2723),
-                        ),
+                        icon: Icon(Icons.arrow_back_ios_new, color: textColor),
                       ),
                       Expanded(
                         child: Text(
@@ -52,7 +62,7 @@ class ContentScreen extends StatelessWidget {
                           style: GoogleFonts.philosopher(
                             fontSize: 20.sp,
                             fontWeight: FontWeight.bold,
-                            color: const Color(0xFF3E2723),
+                            color: textColor,
                           ),
                         ),
                       ),
@@ -64,7 +74,9 @@ class ContentScreen extends StatelessWidget {
                     content,
                     style: GoogleFonts.outfit(
                       fontSize: 16.sp,
-                      color: const Color(0xFF5D4037),
+                      color: isDark
+                          ? AppColors.igTextSecondary
+                          : const Color(0xFF5D4037),
                       height: 1.6,
                     ),
                   ),

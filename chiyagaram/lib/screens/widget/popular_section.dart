@@ -1,11 +1,13 @@
 import 'dart:ui';
 import 'package:chiyagaram/responsive/size_config.dart';
+import 'package:chiyagaram/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 // Popular Section Widget - Simple Text Based
 class PopularSection extends StatelessWidget {
-  const PopularSection({super.key});
+  final bool isDark;
+  const PopularSection({super.key, required this.isDark});
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +23,7 @@ class PopularSection extends StatelessWidget {
             style: GoogleFonts.philosopher(
               fontSize: 28.sp,
               fontWeight: FontWeight.bold,
-              color: const Color(0xFF3E2723),
+              color: isDark ? Colors.white : const Color(0xFF3E2723),
               letterSpacing: -0.5,
               height: 1.2,
             ),
@@ -36,7 +38,9 @@ class PopularSection extends StatelessWidget {
               textAlign: TextAlign.center,
               style: GoogleFonts.outfit(
                 fontSize: 14.sp,
-                color: const Color(0xFF795548).withValues(alpha: 0.8),
+                color: isDark
+                    ? AppColors.igTextSecondary
+                    : const Color(0xFF795548).withValues(alpha: 0.8),
                 fontWeight: FontWeight.w400,
                 height: 1.6,
                 letterSpacing: 0.2,
@@ -52,19 +56,27 @@ class PopularSection extends StatelessWidget {
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [
-                  Colors.white.withValues(alpha: 0.4),
-                  Colors.white.withValues(alpha: 0.1),
-                ],
+                colors: isDark
+                    ? [
+                        AppColors.igSurface.withValues(alpha: 0.6),
+                        AppColors.igSurface.withValues(alpha: 0.2),
+                      ]
+                    : [
+                        Colors.white.withValues(alpha: 0.4),
+                        Colors.white.withValues(alpha: 0.1),
+                      ],
               ),
               borderRadius: BorderRadius.circular(20.w),
               border: Border.all(
-                color: Colors.white.withValues(alpha: 0.6),
+                color: isDark
+                    ? AppColors.igBorder.withValues(alpha: 0.5)
+                    : Colors.white.withValues(alpha: 0.6),
                 width: 1.5.w,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: const Color(0xFF8D6E63).withValues(alpha: 0.1),
+                  color: (isDark ? Colors.black : const Color(0xFF8D6E63))
+                      .withValues(alpha: 0.1),
                   blurRadius: 20.w,
                   offset: Offset(0, 8.h),
                 ),
@@ -82,7 +94,9 @@ class PopularSection extends StatelessWidget {
                       style: GoogleFonts.philosopher(
                         fontSize: 16.sp,
                         fontWeight: FontWeight.w600,
-                        color: const Color(0xFFE64A19),
+                        color: isDark
+                            ? AppColors.white
+                            : const Color(0xFFE64A19),
                         letterSpacing: 0.5,
                       ),
                     ),
@@ -92,7 +106,9 @@ class PopularSection extends StatelessWidget {
                       textAlign: TextAlign.center,
                       style: GoogleFonts.outfit(
                         fontSize: 12.sp,
-                        color: const Color(0xFF795548),
+                        color: isDark
+                            ? AppColors.igTextSecondary
+                            : const Color(0xFF795548),
                         fontWeight: FontWeight.w400,
                       ),
                     ),

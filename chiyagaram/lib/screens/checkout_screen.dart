@@ -2,6 +2,7 @@ import 'package:chiyagaram/models/cart_model.dart';
 import 'package:chiyagaram/responsive/size_config.dart';
 import 'package:chiyagaram/screens/widget/background_scaffold.dart';
 import 'package:chiyagaram/theme/theme_provider.dart';
+import 'package:chiyagaram/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -27,9 +28,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isDark = themeProvider.isDarkMode;
     final textColor = isDark ? Colors.white : const Color(0xFF3E2723);
-    final subTextColor = isDark ? Colors.white70 : const Color(0xFF5D4037);
+    final subTextColor = isDark
+        ? AppColors.igTextSecondary
+        : const Color(0xFF5D4037);
     final cardColor = isDark
-        ? const Color(0xFF5D4037).withOpacity(0.4)
+        ? AppColors.igSurface.withValues(alpha: 0.6)
         : Colors.white.withValues(alpha: 0.4);
 
     return BackgroundScaffold(
@@ -38,11 +41,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back_ios_new,
-            color: textColor,
-            size: 20.sp,
-          ),
+          icon: Icon(Icons.arrow_back_ios_new, color: textColor, size: 20.sp),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
@@ -66,10 +65,13 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               height: 200.w,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: (isDark ? const Color(0xFF4E342E) : const Color(0xFFFFCCBC)).withValues(alpha: 0.4),
+                color: (isDark ? AppColors.igSurface : const Color(0xFFFFCCBC))
+                    .withValues(alpha: 0.4),
                 boxShadow: [
                   BoxShadow(
-                    color: (isDark ? const Color(0xFF4E342E) : const Color(0xFFFFCCBC)).withValues(alpha: 0.2),
+                    color:
+                        (isDark ? AppColors.igSurface : const Color(0xFFFFCCBC))
+                            .withValues(alpha: 0.2),
                     blurRadius: 50.w,
                     spreadRadius: 10.w,
                   ),
@@ -122,7 +124,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                   color: subTextColor.withValues(alpha: 0.5),
                                 ),
                                 filled: true,
-                                fillColor: isDark ? Colors.white.withOpacity(0.05) : Colors.white.withValues(alpha: 0.5),
+                                fillColor: isDark
+                                    ? Colors.white.withValues(alpha: 0.05)
+                                    : Colors.white.withValues(alpha: 0.5),
                                 contentPadding: EdgeInsets.symmetric(
                                   horizontal: 20.w,
                                   vertical: 15.w,
@@ -134,7 +138,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                 enabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(15.w),
                                   borderSide: BorderSide(
-                                    color: isDark ? Colors.white12 : Colors.white.withValues(alpha: 0.5),
+                                    color: isDark
+                                        ? Colors.white12
+                                        : Colors.white.withValues(alpha: 0.5),
                                   ),
                                 ),
                                 focusedBorder: OutlineInputBorder(
@@ -175,7 +181,12 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                               subTextColor,
                             ),
                             SizedBox(height: 8.w),
-                            _buildSummaryRow("Serving Fee", "0", textColor, subTextColor),
+                            _buildSummaryRow(
+                              "Serving Fee",
+                              "0",
+                              textColor,
+                              subTextColor,
+                            ),
                             Divider(
                               color: textColor.withValues(alpha: 0.2),
                               height: 24.w,
@@ -253,7 +264,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                           height: 55.w,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(30.w),
-                            color: isDark ? Colors.white : const Color(0xFF1A1A1A),
+                            color: isDark
+                                ? Colors.white
+                                : const Color(0xFF1A1A1A),
                             boxShadow: [
                               BoxShadow(
                                 color: Colors.black.withValues(alpha: 0.2),
@@ -296,16 +309,17 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     );
   }
 
-  Widget _buildGlassContainer({required Widget child, required Color cardColor, required Color textColor}) {
+  Widget _buildGlassContainer({
+    required Widget child,
+    required Color cardColor,
+    required Color textColor,
+  }) {
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
         color: cardColor,
         borderRadius: BorderRadius.circular(20.w),
-        border: Border.all(
-          color: textColor.withValues(alpha: 0.1),
-          width: 1,
-        ),
+        border: Border.all(color: textColor.withValues(alpha: 0.1), width: 1),
         boxShadow: [
           BoxShadow(
             color: textColor.withValues(alpha: 0.05),
@@ -318,16 +332,18 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     );
   }
 
-  Widget _buildSummaryRow(String label, String value, Color textColor, Color subTextColor) {
+  Widget _buildSummaryRow(
+    String label,
+    String value,
+    Color textColor,
+    Color subTextColor,
+  ) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
           label,
-          style: GoogleFonts.outfit(
-            fontSize: 16.sp,
-            color: subTextColor,
-          ),
+          style: GoogleFonts.outfit(fontSize: 16.sp, color: subTextColor),
         ),
         Text(
           "Rs. $value",

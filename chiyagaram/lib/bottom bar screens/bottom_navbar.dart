@@ -4,6 +4,7 @@ import 'package:iconsax/iconsax.dart';
 import 'package:chiyagaram/responsive/size_config.dart';
 import 'package:provider/provider.dart';
 import 'package:chiyagaram/models/cart_model.dart';
+import 'package:chiyagaram/theme/theme_provider.dart';
 
 class GlassBottomNavBar extends StatefulWidget {
   final int currentIndex;
@@ -22,6 +23,9 @@ class GlassBottomNavBar extends StatefulWidget {
 class _GlassBottomNavBarState extends State<GlassBottomNavBar> {
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDark = themeProvider.isDarkMode;
+
     return Padding(
       padding: EdgeInsets.fromLTRB(20.w, 0, 20.w, 20.h),
       child: ClipRRect(
@@ -34,16 +38,24 @@ class _GlassBottomNavBarState extends State<GlassBottomNavBar> {
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [
-                  Colors.white.withValues(alpha: 0.6),
-                  Colors.white.withValues(alpha: 0.1),
-                  Colors.white.withValues(alpha: 0.05),
-                ],
+                colors: isDark
+                    ? [
+                        Colors.black.withValues(alpha: 0.8),
+                        Colors.black.withValues(alpha: 0.6),
+                        Colors.black.withValues(alpha: 0.4),
+                      ]
+                    : [
+                        Colors.white.withValues(alpha: 0.6),
+                        Colors.white.withValues(alpha: 0.1),
+                        Colors.white.withValues(alpha: 0.05),
+                      ],
                 stops: const [0.0, 0.3, 1.0],
               ),
               borderRadius: BorderRadius.circular(40.w),
               border: Border.all(
-                color: Colors.white.withValues(alpha: 0.3),
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.1)
+                    : Colors.white.withValues(alpha: 0.3),
                 width: 1.0.w,
               ),
               boxShadow: [
@@ -60,21 +72,23 @@ class _GlassBottomNavBarState extends State<GlassBottomNavBar> {
                 return Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    _buildNavItem(Iconsax.home, Iconsax.home5, 0, null),
+                    _buildNavItem(Iconsax.home, Iconsax.home5, 0, null, isDark),
                     _buildNavItem(
                       Iconsax.menu_board,
                       Iconsax.menu_board5,
                       1,
                       null,
+                      isDark,
                     ),
                     _buildNavItem(
                       Iconsax.shopping_cart,
                       Iconsax.shopping_cart5,
                       2,
                       cart.itemCount,
+                      isDark,
                     ),
                     // _buildNavItem(Iconsax.location, Iconsax.location, 3, null),
-                    _buildNavItem(Iconsax.user, Iconsax.user, 3, null),
+                    _buildNavItem(Iconsax.user, Iconsax.user, 3, null, isDark),
                   ],
                 );
               },
@@ -90,6 +104,7 @@ class _GlassBottomNavBarState extends State<GlassBottomNavBar> {
     IconData activeIcon,
     int index,
     int? badgeCount,
+    bool isDark,
   ) {
     final isSelected = widget.currentIndex == index;
     final showBadge = badgeCount != null && badgeCount > 0;
@@ -106,15 +121,21 @@ class _GlassBottomNavBarState extends State<GlassBottomNavBar> {
           padding: EdgeInsets.all(14.w),
           decoration: isSelected
               ? BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.4),
+                  color: isDark
+                      ? Colors.white.withValues(alpha: 0.15)
+                      : Colors.white.withValues(alpha: 0.4),
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.5),
+                    color: isDark
+                        ? Colors.white.withValues(alpha: 0.2)
+                        : Colors.white.withValues(alpha: 0.5),
                     width: 1.w,
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.white.withValues(alpha: 0.2),
+                      color: isDark
+                          ? Colors.black.withValues(alpha: 0.2)
+                          : Colors.white.withValues(alpha: 0.2),
                       blurRadius: 20.w,
                       spreadRadius: 2.w,
                     ),
@@ -139,13 +160,10 @@ class _GlassBottomNavBarState extends State<GlassBottomNavBar> {
                   isSelected ? activeIcon : icon,
                   key: ValueKey<bool>(isSelected),
                   color: isSelected
-                      ? const Color.fromARGB(255, 0, 0, 0)
-                      : const Color.fromARGB(
-                          255,
-                          0,
-                          0,
-                          0,
-                        ).withValues(alpha: 0.6),
+                      ? (isDark ? Colors.white : Colors.black)
+                      : (isDark
+                            ? Colors.white60
+                            : Colors.black.withValues(alpha: 0.6)),
                   size: 26.sp,
                 ),
               ),

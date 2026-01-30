@@ -5,7 +5,6 @@ import 'package:chiyagaram/animations/fade_animation.dart';
 import 'package:chiyagaram/responsive/size_config.dart';
 import 'package:chiyagaram/screens/auth/login_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -104,7 +103,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
                                     border: Border.all(
-                                      color: isDark ? Colors.white24 : Colors.white,
+                                      color: isDark
+                                          ? Colors.white24
+                                          : Colors.white,
                                       width: 4.w,
                                     ),
                                   ),

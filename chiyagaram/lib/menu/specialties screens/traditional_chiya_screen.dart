@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:chiyagaram/models/cart_model.dart';
+import 'package:chiyagaram/theme/app_colors.dart';
+import 'package:chiyagaram/theme/theme_provider.dart';
 import 'package:iconsax/iconsax.dart';
 
 class TraditionalChiyaScreen extends StatelessWidget {
@@ -10,6 +12,13 @@ class TraditionalChiyaScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDark = themeProvider.isDarkMode;
+    final textColor = isDark ? Colors.white : const Color(0xFF3E2723);
+    final subTextColor = isDark
+        ? AppColors.igTextSecondary
+        : const Color(0xFF5D4037);
+
     final List<Map<String, dynamic>> chiyaItems = [
       {
         'id': 'masala_chiya',
@@ -51,11 +60,17 @@ class TraditionalChiyaScreen extends StatelessWidget {
 
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Color(0xFFFFF5E6), Color(0xFFFFE9CC), Color(0xFFFFF0D9)],
+            colors: isDark
+                ? [AppColors.igBlack, AppColors.igDarkGrey, AppColors.igBlack]
+                : [
+                    const Color(0xFFFFF5E6),
+                    const Color(0xFFFFE9CC),
+                    const Color(0xFFFFF0D9),
+                  ],
           ),
         ),
         child: SafeArea(
@@ -68,10 +83,7 @@ class TraditionalChiyaScreen extends StatelessWidget {
                   children: [
                     IconButton(
                       onPressed: () => Navigator.pop(context),
-                      icon: const Icon(
-                        Icons.arrow_back_ios_new,
-                        color: Color(0xFF3E2723),
-                      ),
+                      icon: Icon(Icons.arrow_back_ios_new, color: textColor),
                     ),
                     Expanded(
                       child: Text(
@@ -80,7 +92,7 @@ class TraditionalChiyaScreen extends StatelessWidget {
                         style: GoogleFonts.philosopher(
                           fontSize: 22.sp,
                           fontWeight: FontWeight.bold,
-                          color: const Color(0xFF3E2723),
+                          color: textColor,
                         ),
                       ),
                     ),
@@ -92,9 +104,9 @@ class TraditionalChiyaScreen extends StatelessWidget {
                               onPressed: () {
                                 // Navigate to cart if needed
                               },
-                              icon: const Icon(
+                              icon: Icon(
                                 Iconsax.shopping_bag,
-                                color: Color(0xFF3E2723),
+                                color: textColor,
                               ),
                             ),
                             if (cart.itemCount > 0)
@@ -142,7 +154,13 @@ class TraditionalChiyaScreen extends StatelessWidget {
                   itemCount: chiyaItems.length,
                   itemBuilder: (context, index) {
                     final item = chiyaItems[index];
-                    return _buildChiyaCard(context, item);
+                    return _buildChiyaCard(
+                      context,
+                      item,
+                      isDark,
+                      textColor,
+                      subTextColor,
+                    );
                   },
                 ),
               ),
@@ -153,22 +171,35 @@ class TraditionalChiyaScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildChiyaCard(BuildContext context, Map<String, dynamic> item) {
+  Widget _buildChiyaCard(
+    BuildContext context,
+    Map<String, dynamic> item,
+    bool isDark,
+    Color textColor,
+    Color subTextColor,
+  ) {
     final color = item['color'] as Color;
 
     return Container(
       margin: EdgeInsets.only(bottom: 16.h),
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: const Color(0xFFFFF9F0).withValues(alpha: 0.8),
+        color: isDark
+            ? AppColors.igSurface.withValues(alpha: 0.5)
+            : const Color(0xFFFFF9F0).withValues(alpha: 0.8),
         borderRadius: BorderRadius.circular(20.w),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.05),
             blurRadius: 10.w,
             offset: Offset(0, 4.h),
           ),
         ],
+        border: Border.all(
+          color: isDark
+              ? AppColors.igBorder.withValues(alpha: 0.5)
+              : Colors.black.withValues(alpha: 0.05),
+        ),
       ),
       child: Row(
         children: [
@@ -208,7 +239,7 @@ class TraditionalChiyaScreen extends StatelessWidget {
                   style: GoogleFonts.philosopher(
                     fontSize: 18.sp,
                     fontWeight: FontWeight.bold,
-                    color: const Color(0xFF3E2723),
+                    color: textColor,
                   ),
                 ),
                 SizedBox(height: 4.h),
@@ -216,7 +247,7 @@ class TraditionalChiyaScreen extends StatelessWidget {
                   item['description'],
                   style: GoogleFonts.outfit(
                     fontSize: 12.sp,
-                    color: const Color(0xFF5D4037).withValues(alpha: 0.7),
+                    color: subTextColor.withValues(alpha: 0.7),
                     height: 1.3,
                   ),
                   maxLines: 2,
@@ -242,7 +273,7 @@ class TraditionalChiyaScreen extends StatelessWidget {
               width: 44.w,
               height: 44.w,
               decoration: BoxDecoration(
-                color: const Color(0xFF3E2723),
+                color: isDark ? AppColors.white : AppColors.primary,
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
@@ -252,7 +283,11 @@ class TraditionalChiyaScreen extends StatelessWidget {
                   ),
                 ],
               ),
-              child: Icon(Icons.add, color: Colors.white, size: 24.sp),
+              child: Icon(
+                Icons.add,
+                color: isDark ? Colors.black : Colors.white,
+                size: 24.sp,
+              ),
             ),
           ),
         ],
@@ -262,6 +297,10 @@ class TraditionalChiyaScreen extends StatelessWidget {
 
   void _addToCart(BuildContext context, Map<String, dynamic> item) {
     final cart = Provider.of<CartModel>(context, listen: false);
+    final isDark = Provider.of<ThemeProvider>(
+      context,
+      listen: false,
+    ).isDarkMode;
 
     cart.addItem(
       productId: item['id'],
@@ -286,12 +325,13 @@ class TraditionalChiyaScreen extends StatelessWidget {
                 style: GoogleFonts.outfit(
                   fontSize: 14.sp,
                   fontWeight: FontWeight.w500,
+                  color: Colors.white,
                 ),
               ),
             ),
           ],
         ),
-        backgroundColor: const Color(0xFF3E2723),
+        backgroundColor: isDark ? AppColors.igSurface : AppColors.primary,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12.w),

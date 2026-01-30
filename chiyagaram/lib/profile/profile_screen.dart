@@ -9,6 +9,7 @@ import 'package:chiyagaram/profile/setting/help_support_screen.dart';
 import 'package:chiyagaram/profile/my_orders_screen.dart';
 import 'package:chiyagaram/screens/auth/login_screen.dart';
 import 'package:chiyagaram/responsive/size_config.dart';
+import 'package:chiyagaram/theme/app_colors.dart';
 import 'package:provider/provider.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -19,9 +20,11 @@ class ProfileScreen extends StatelessWidget {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isDark = themeProvider.isDarkMode;
     final textColor = isDark ? Colors.white : const Color(0xFF3E2723);
-    final subTextColor = isDark ? Colors.white70 : const Color(0xFF795548);
+    final subTextColor = isDark
+        ? AppColors.igTextSecondary
+        : const Color(0xFF795548);
     final cardColor = isDark
-        ? const Color(0xFF5D4037).withOpacity(0.4)
+        ? AppColors.igSurface.withValues(alpha: 0.6)
         : Colors.white.withValues(alpha: 0.6);
 
     return BackgroundScaffold(
@@ -45,10 +48,10 @@ class ProfileScreen extends StatelessWidget {
                     ),
                     child: CircleAvatar(
                       radius: 50.w,
-                      backgroundColor: isDark ? const Color(0xFF4E342E) : Colors.white,
-                      backgroundImage: const AssetImage(
-                        'images/profile.png',
-                      ),
+                      backgroundColor: isDark
+                          ? AppColors.igSurface
+                          : Colors.white,
+                      backgroundImage: const AssetImage('images/profile.png'),
                     ),
                   ),
                   SizedBox(height: 16.h),
@@ -136,9 +139,12 @@ class ProfileScreen extends StatelessWidget {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () => _showLogoutConfirmation(context, isDark, textColor),
+                  onPressed: () =>
+                      _showLogoutConfirmation(context, isDark, textColor),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(255, 163, 61, 61),
+                    backgroundColor: isDark
+                        ? Colors.white
+                        : const Color.fromARGB(255, 163, 61, 61),
                     padding: EdgeInsets.symmetric(vertical: 16.h),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16.w),
@@ -150,7 +156,7 @@ class ProfileScreen extends StatelessWidget {
                     children: [
                       Icon(
                         Iconsax.logout,
-                        color: Colors.white,
+                        color: isDark ? Colors.black : Colors.white,
                         size: 20.sp,
                       ),
                       SizedBox(width: 8.w),
@@ -159,7 +165,7 @@ class ProfileScreen extends StatelessWidget {
                         style: GoogleFonts.outfit(
                           fontSize: 16.sp,
                           fontWeight: FontWeight.w600,
-                          color: Colors.white,
+                          color: isDark ? Colors.black : Colors.white,
                         ),
                       ),
                     ],
@@ -193,7 +199,10 @@ class ProfileScreen extends StatelessWidget {
             decoration: BoxDecoration(
               color: cardColor,
               borderRadius: BorderRadius.circular(20.w),
-              border: Border.all(color: textColor.withOpacity(0.1), width: 1.w),
+              border: Border.all(
+                color: textColor.withValues(alpha: 0.1),
+                width: 1.w,
+              ),
               boxShadow: [
                 BoxShadow(
                   color: textColor.withValues(alpha: 0.05),
@@ -210,11 +219,7 @@ class ProfileScreen extends StatelessWidget {
                     color: textColor.withValues(alpha: 0.05),
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(
-                    icon,
-                    color: textColor,
-                    size: 22.sp,
-                  ),
+                  child: Icon(icon, color: textColor, size: 22.sp),
                 ),
                 SizedBox(width: 16.w),
                 Expanded(
@@ -230,7 +235,7 @@ class ProfileScreen extends StatelessWidget {
                 Icon(
                   Icons.arrow_forward_ios_rounded,
                   size: 16.sp,
-                  color: textColor.withOpacity(0.5),
+                  color: textColor.withValues(alpha: 0.5),
                 ),
               ],
             ),
@@ -240,11 +245,15 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  void _showLogoutConfirmation(BuildContext context, bool isDark, Color textColor) {
+  void _showLogoutConfirmation(
+    BuildContext context,
+    bool isDark,
+    Color textColor,
+  ) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: isDark ? const Color(0xFF4E342E) : const Color(0xFFFFF8E1),
+        backgroundColor: isDark ? AppColors.igSurface : const Color(0xFFFFF8E1),
         title: Text(
           "Logout",
           style: GoogleFonts.philosopher(
@@ -254,15 +263,12 @@ class ProfileScreen extends StatelessWidget {
         ),
         content: Text(
           "Are you sure you want to logout?",
-          style: GoogleFonts.outfit(color: textColor.withOpacity(0.8)),
+          style: GoogleFonts.outfit(color: textColor.withValues(alpha: 0.8)),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text(
-              "Cancel",
-              style: GoogleFonts.outfit(color: textColor),
-            ),
+            child: Text("Cancel", style: GoogleFonts.outfit(color: textColor)),
           ),
           TextButton(
             onPressed: () {
@@ -276,7 +282,7 @@ class ProfileScreen extends StatelessWidget {
             child: Text(
               "Logout",
               style: GoogleFonts.outfit(
-                color: Colors.red,
+                color: isDark ? Colors.redAccent : Colors.red,
                 fontWeight: FontWeight.bold,
               ),
             ),

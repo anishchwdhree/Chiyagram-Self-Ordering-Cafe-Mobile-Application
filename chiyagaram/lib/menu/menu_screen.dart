@@ -3,6 +3,7 @@ import 'package:chiyagaram/menu/specialties%20screens/hookah_screen.dart';
 import 'package:chiyagaram/menu/specialties%20screens/snacks_screen.dart';
 import 'package:chiyagaram/menu/specialties%20screens/traditional_chiya_screen.dart';
 import 'package:chiyagaram/screens/widget/background_scaffold.dart';
+import 'package:chiyagaram/theme/app_colors.dart';
 import 'package:chiyagaram/theme/theme_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -21,7 +22,9 @@ class _MenuScreenState extends State<MenuScreen> {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isDark = themeProvider.isDarkMode;
     final textColor = isDark ? Colors.white : const Color(0xFF3E2723);
-    final subTextColor = isDark ? Colors.white70 : const Color(0xFF5D4037);
+    final subTextColor = isDark
+        ? AppColors.igTextSecondary
+        : const Color(0xFF5D4037);
 
     return BackgroundScaffold(
       body: Stack(
@@ -32,7 +35,7 @@ class _MenuScreenState extends State<MenuScreen> {
             right: -50.w,
             child: _buildBackgroundCircle(
               200.w,
-              isDark ? const Color(0xFF4E342E) : const Color(0xFFFFCCBC),
+              isDark ? AppColors.igSurface : const Color(0xFFFFCCBC),
               0.3,
             ),
           ),
@@ -83,7 +86,11 @@ class _MenuScreenState extends State<MenuScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         // Today's Special Banner
-                        _buildTodaysSpecialBanner(isDark, textColor, subTextColor),
+                        _buildTodaysSpecialBanner(
+                          isDark,
+                          textColor,
+                          subTextColor,
+                        ),
 
                         SizedBox(height: 30.h),
 
@@ -107,8 +114,34 @@ class _MenuScreenState extends State<MenuScreen> {
                               SizedBox(width: 15.w),
                               Expanded(
                                 child: Container(
-                                  height: 1,
-                                  color: (isDark ? Colors.white : const Color(0xFF8D6E63)).withValues(alpha: 0.3),
+                                  height: 1.2,
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      colors: isDark
+                                          ? [
+                                              Colors.white.withValues(
+                                                alpha: 0.0,
+                                              ),
+                                              Colors.white.withValues(
+                                                alpha: 0.5,
+                                              ),
+                                              Colors.white.withValues(
+                                                alpha: 0.0,
+                                              ),
+                                            ]
+                                          : [
+                                              const Color(
+                                                0xFF8D6E63,
+                                              ).withValues(alpha: 0.0),
+                                              const Color(
+                                                0xFF8D6E63,
+                                              ).withValues(alpha: 0.3),
+                                              const Color(
+                                                0xFF8D6E63,
+                                              ).withValues(alpha: 0.0),
+                                            ],
+                                    ),
+                                  ),
                                 ),
                               ),
                             ],
@@ -130,7 +163,8 @@ class _MenuScreenState extends State<MenuScreen> {
                                 onTap: () => Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (_) => const TraditionalChiyaScreen(),
+                                    builder: (_) =>
+                                        const TraditionalChiyaScreen(),
                                   ),
                                 ),
                               ),
@@ -175,7 +209,11 @@ class _MenuScreenState extends State<MenuScreen> {
     );
   }
 
-  Widget _buildTodaysSpecialBanner(bool isDark, Color textColor, Color subTextColor) {
+  Widget _buildTodaysSpecialBanner(
+    bool isDark,
+    Color textColor,
+    Color subTextColor,
+  ) {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 20.w),
       width: double.infinity,
@@ -185,8 +223,8 @@ class _MenuScreenState extends State<MenuScreen> {
         gradient: LinearGradient(
           colors: isDark
               ? [
-                  const Color(0xFF4E342E).withValues(alpha: 0.9),
-                  const Color(0xFF3E2723).withValues(alpha: 0.8),
+                  AppColors.igSurface.withValues(alpha: 0.9),
+                  AppColors.igDarkGrey.withValues(alpha: 0.8),
                 ]
               : [
                   const Color(0xFFF8BBD0).withValues(alpha: 0.9),
@@ -197,13 +235,17 @@ class _MenuScreenState extends State<MenuScreen> {
         ),
         boxShadow: [
           BoxShadow(
-            color: (isDark ? Colors.black : const Color(0xFF8D6E63)).withValues(alpha: 0.2),
+            color: (isDark ? Colors.black : const Color(0xFF8D6E63)).withValues(
+              alpha: 0.2,
+            ),
             blurRadius: 15,
             offset: const Offset(0, 8),
           ),
         ],
         border: Border.all(
-          color: (isDark ? Colors.white12 : Colors.white.withValues(alpha: 0.4)),
+          color: (isDark
+              ? AppColors.igBorder
+              : Colors.white.withValues(alpha: 0.4)),
           width: 1,
         ),
       ),
@@ -223,7 +265,9 @@ class _MenuScreenState extends State<MenuScreen> {
                     style: GoogleFonts.outfit(
                       fontSize: 12.sp,
                       fontWeight: FontWeight.w600,
-                      color: isDark ? Colors.white70 : const Color(0xFF5D4037),
+                      color: isDark
+                          ? AppColors.igTextSecondary
+                          : const Color(0xFF5D4037),
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -273,7 +317,9 @@ class _MenuScreenState extends State<MenuScreen> {
                   padding: EdgeInsets.all(5.w),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: isDark ? Colors.black12 : Colors.white.withValues(alpha: 0.4),
+                    color: isDark
+                        ? Colors.black12
+                        : Colors.white.withValues(alpha: 0.4),
                   ),
                   child: ClipOval(
                     child: Image.asset(
@@ -281,11 +327,15 @@ class _MenuScreenState extends State<MenuScreen> {
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) {
                         return Container(
-                          color: isDark ? const Color(0xFF4E342E) : const Color(0xFFFFE0B2),
+                          color: isDark
+                              ? AppColors.igSurface
+                              : const Color(0xFFFFE0B2),
                           child: Icon(
                             Icons.local_cafe,
                             size: 40.sp,
-                            color: isDark ? Colors.white38 : const Color(0xFF8D6E63),
+                            color: isDark
+                                ? Colors.white38
+                                : const Color(0xFF8D6E63),
                           ),
                         );
                       },
@@ -315,6 +365,12 @@ class _MenuScreenState extends State<MenuScreen> {
         constraints: BoxConstraints(minHeight: 90.h, maxHeight: 120.h),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(30.w),
+          border: Border.all(
+            color: (isDark
+                ? AppColors.igBorder
+                : Colors.white.withValues(alpha: 0.4)),
+            width: 1,
+          ),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.2),
@@ -332,11 +388,13 @@ class _MenuScreenState extends State<MenuScreen> {
                 child: Image.asset(
                   imagePath,
                   fit: BoxFit.cover,
-                  color: Colors.black.withValues(alpha: isDark ? 0.4 : 0.2),
+                  color: Colors.black.withValues(alpha: isDark ? 0.5 : 0.2),
                   colorBlendMode: BlendMode.darken,
                   errorBuilder: (context, error, stackTrace) {
                     return Container(
-                      color: isDark ? const Color(0xFF2D1B18) : const Color(0xFF3E2723),
+                      color: isDark
+                          ? AppColors.igSurface
+                          : const Color(0xFF3E2723),
                       child: Icon(
                         Icons.image,
                         size: 40.sp,
