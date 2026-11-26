@@ -1,6 +1,9 @@
 import 'package:chiyagaram/models/cart_model.dart';
 import 'package:chiyagaram/responsive/size_config.dart';
 import 'package:chiyagaram/screens/widget/background_scaffold.dart';
+import 'package:chiyagaram/services/notification_provider.dart';
+import 'package:chiyagaram/services/connectivity_provider.dart';
+import 'package:chiyagaram/services/order_service.dart';
 import 'package:chiyagaram/theme/theme_provider.dart';
 import 'package:chiyagaram/theme/app_colors.dart';
 import 'package:flutter/material.dart';
@@ -16,11 +19,112 @@ class CheckoutScreen extends StatefulWidget {
 
 class _CheckoutScreenState extends State<CheckoutScreen> {
   final TextEditingController _tableController = TextEditingController();
+  bool _isLoading = false;
 
   @override
   void dispose() {
     _tableController.dispose();
     super.dispose();
+  }
+
+  Future<void> _handleOrderPlacement(CartModel cart) async {
+    final connectivityProvider = Provider.of<ConnectivityProvider>(
+      context,
+      listen: false,
+    );
+    if (!connectivityProvider.isOnline) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            "No Internet connection. Unable to place order.",
+            style: GoogleFonts.outfit(color: Colors.white),
+          ),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+      return;
+    }
+
+    final tableNumberStr = _tableController.text.trim();
+    if (tableNumberStr.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            "Please enter your table number",
+            style: GoogleFonts.outfit(color: Colors.white),
+          ),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+      return;
+    }
+
+    final tableNumber = int.tryParse(tableNumberStr);
+    if (tableNumber == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            "Please enter a valid numeric table number",
+            style: GoogleFonts.outfit(color: Colors.white),
+          ),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final orderService = OrderService();
+      final orderId = await orderService.placeOrder(
+        tableNumber: tableNumber,
+        items: cart.items.values.toList(),
+        totalAmount: cart.totalPrice,
+      );
+
+      if (!mounted) return;
+
+      // Register with NotificationProvider
+      Provider.of<NotificationProvider>(
+        context,
+        listen: false,
+      ).addActiveOrder(orderId);
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            "Order Placed for Table $tableNumber!",
+            style: GoogleFonts.outfit(color: Colors.white),
+          ),
+          backgroundColor: Colors.green,
+        ),
+      );
+
+      cart.clearCart();
+      Navigator.popUntil(context, (route) => route.isFirst);
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            "Failed to place order. Please try again.",
+            style: GoogleFonts.outfit(color: Colors.white),
+          ),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
   }
 
   @override
@@ -81,217 +185,192 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           ),
 
           // Content
-          SafeArea(
-            child: Consumer<CartModel>(
-              builder: (context, cart, child) {
-                return SingleChildScrollView(
-                  physics: const BouncingScrollPhysics(),
-                  padding: EdgeInsets.symmetric(horizontal: 20.w),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(height: 20.w),
-
-                      // Table Number Section
-                      _buildSectionTitle("Enter Table Details", textColor),
-                      SizedBox(height: 10.w),
-                      _buildGlassContainer(
-                        cardColor: cardColor,
-                        textColor: textColor,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "Table Number",
-                              style: GoogleFonts.outfit(
-                                fontSize: 16.sp,
-                                fontWeight: FontWeight.bold,
-                                color: textColor,
+          Consumer<CartModel>(
+            builder: (context, cart, child) {
+              return SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                padding: EdgeInsets.symmetric(horizontal: 20.w).copyWith(
+                  top:
+                      MediaQuery.of(context).padding.top +
+                      kToolbarHeight +
+                      20.h,
+                  bottom: MediaQuery.of(context).padding.bottom + 20.h,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Table Number Section
+                    _buildSectionTitle("Enter Table Details", textColor),
+                    SizedBox(height: 10.w),
+                    _buildGlassContainer(
+                      cardColor: cardColor,
+                      textColor: textColor,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Table Number",
+                            style: GoogleFonts.outfit(
+                              fontSize: 16.sp,
+                              fontWeight: FontWeight.bold,
+                              color: textColor,
+                            ),
+                          ),
+                          SizedBox(height: 10.w),
+                          TextField(
+                            controller: _tableController,
+                            keyboardType: TextInputType.number,
+                            style: GoogleFonts.outfit(
+                              fontSize: 18.sp,
+                              color: textColor,
+                              fontWeight: FontWeight.w600,
+                            ),
+                            decoration: InputDecoration(
+                              hintText: "Ex: 5",
+                              hintStyle: GoogleFonts.outfit(
+                                color: subTextColor.withValues(alpha: 0.5),
+                              ),
+                              filled: true,
+                              fillColor: isDark
+                                  ? Colors.white.withValues(alpha: 0.05)
+                                  : Colors.white.withValues(alpha: 0.5),
+                              contentPadding: EdgeInsets.symmetric(
+                                horizontal: 20.w,
+                                vertical: 15.w,
+                              ),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(15.w),
+                                borderSide: BorderSide.none,
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(15.w),
+                                borderSide: BorderSide(
+                                  color: isDark
+                                      ? Colors.white12
+                                      : Colors.white.withValues(alpha: 0.5),
+                                ),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(15.w),
+                                borderSide: BorderSide(
+                                  color: textColor,
+                                  width: 1.5,
+                                ),
                               ),
                             ),
-                            SizedBox(height: 10.w),
-                            TextField(
-                              controller: _tableController,
-                              keyboardType: TextInputType.number,
-                              style: GoogleFonts.outfit(
-                                fontSize: 18.sp,
-                                color: textColor,
-                                fontWeight: FontWeight.w600,
-                              ),
-                              decoration: InputDecoration(
-                                hintText: "Ex: 5",
-                                hintStyle: GoogleFonts.outfit(
-                                  color: subTextColor.withValues(alpha: 0.5),
-                                ),
-                                filled: true,
-                                fillColor: isDark
-                                    ? Colors.white.withValues(alpha: 0.05)
-                                    : Colors.white.withValues(alpha: 0.5),
-                                contentPadding: EdgeInsets.symmetric(
-                                  horizontal: 20.w,
-                                  vertical: 15.w,
-                                ),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(15.w),
-                                  borderSide: BorderSide.none,
-                                ),
-                                enabledBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(15.w),
-                                  borderSide: BorderSide(
-                                    color: isDark
-                                        ? Colors.white12
-                                        : Colors.white.withValues(alpha: 0.5),
-                                  ),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(15.w),
-                                  borderSide: BorderSide(
-                                    color: textColor,
-                                    width: 1.5,
-                                  ),
-                                ),
-                              ),
+                          ),
+                          SizedBox(height: 10.w),
+                          Text(
+                            "Please enter the table number where you are seated.",
+                            style: GoogleFonts.outfit(
+                              fontSize: 14.sp,
+                              color: subTextColor.withValues(alpha: 0.8),
                             ),
-                            SizedBox(height: 10.w),
-                            Text(
-                              "Please enter the table number where you are seated.",
-                              style: GoogleFonts.outfit(
-                                fontSize: 14.sp,
-                                color: subTextColor.withValues(alpha: 0.8),
-                              ),
-                            ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
+                    ),
 
-                      SizedBox(height: 30.w),
+                    SizedBox(height: 30.w),
 
-                      // Order Summary Section
-                      _buildSectionTitle("Order Summary", textColor),
-                      SizedBox(height: 10.w),
-                      _buildGlassContainer(
-                        cardColor: cardColor,
-                        textColor: textColor,
-                        child: Column(
-                          children: [
-                            _buildSummaryRow(
-                              "Subtotal",
-                              cart.totalPrice.toStringAsFixed(0),
-                              textColor,
-                              subTextColor,
-                            ),
-                            SizedBox(height: 8.w),
-                            _buildSummaryRow(
-                              "Serving Fee",
-                              "0",
-                              textColor,
-                              subTextColor,
-                            ),
-                            Divider(
-                              color: textColor.withValues(alpha: 0.2),
-                              height: 24.w,
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  "Total",
-                                  style: GoogleFonts.philosopher(
-                                    fontSize: 20.sp,
-                                    fontWeight: FontWeight.bold,
-                                    color: textColor,
-                                  ),
-                                ),
-                                Text(
-                                  "Rs. ${cart.totalPrice.toStringAsFixed(0)}",
-                                  style: GoogleFonts.philosopher(
-                                    fontSize: 20.sp,
-                                    fontWeight: FontWeight.bold,
-                                    color: textColor,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      SizedBox(height: 50.w),
-
-                      // Confirm Button
-                      GestureDetector(
-                        onTap: () {
-                          if (_tableController.text.isEmpty) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  "Please enter your table number",
-                                  style: GoogleFonts.outfit(
-                                    color: Colors.white,
-                                  ),
-                                ),
-                                backgroundColor: Colors.redAccent,
-                                behavior: SnackBarBehavior.floating,
-                                margin: EdgeInsets.all(20.w),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10.w),
+                    // Order Summary Section
+                    _buildSectionTitle("Order Summary", textColor),
+                    SizedBox(height: 10.w),
+                    _buildGlassContainer(
+                      cardColor: cardColor,
+                      textColor: textColor,
+                      child: Column(
+                        children: [
+                          _buildSummaryRow(
+                            "Subtotal",
+                            cart.totalPrice.toStringAsFixed(0),
+                            textColor,
+                            subTextColor,
+                          ),
+                          SizedBox(height: 8.w),
+                          _buildSummaryRow(
+                            "Serving Fee",
+                            "0",
+                            textColor,
+                            subTextColor,
+                          ),
+                          Divider(
+                            color: textColor.withValues(alpha: 0.2),
+                            height: 24.w,
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                "Total",
+                                style: GoogleFonts.philosopher(
+                                  fontSize: 20.sp,
+                                  fontWeight: FontWeight.bold,
+                                  color: textColor,
                                 ),
                               ),
-                            );
-                            return;
-                          }
-
-                          // Mock Order Success
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                "Order Placed for Table ${_tableController.text}!",
-                                style: GoogleFonts.outfit(color: Colors.white),
-                              ),
-                              backgroundColor: Colors.green,
-                              behavior: SnackBarBehavior.floating,
-                              margin: EdgeInsets.all(20.w),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10.w),
-                              ),
-                            ),
-                          );
-                          cart.clearCart();
-                          Navigator.popUntil(context, (route) => route.isFirst);
-                        },
-                        child: Container(
-                          width: double.infinity,
-                          height: 55.w,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(30.w),
-                            color: isDark
-                                ? Colors.white
-                                : const Color(0xFF1A1A1A),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.2),
-                                blurRadius: 10.w,
-                                offset: Offset(0, 5.w),
+                              Text(
+                                "Rs. ${cart.totalPrice.toStringAsFixed(0)}",
+                                style: GoogleFonts.philosopher(
+                                  fontSize: 20.sp,
+                                  fontWeight: FontWeight.bold,
+                                  color: textColor,
+                                ),
                               ),
                             ],
                           ),
-                          alignment: Alignment.center,
-                          child: Text(
-                            "Confirm Table Order",
-                            style: GoogleFonts.outfit(
-                              fontSize: 18.sp,
-                              fontWeight: FontWeight.bold,
-                              color: isDark ? Colors.black : Colors.white,
-                            ),
-                          ),
-                        ),
+                        ],
                       ),
-                      SizedBox(height: 30.w),
-                    ],
-                  ),
-                );
-              },
-            ),
+                    ),
+
+                    SizedBox(height: 50.w),
+
+                    // Confirm Button
+                    GestureDetector(
+                      onTap: _isLoading
+                          ? null
+                          : () => _handleOrderPlacement(cart),
+                      child: Container(
+                        width: double.infinity,
+                        height: 55.w,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(30.w),
+                          color: isDark
+                              ? Colors.white
+                              : const Color(0xFF1A1A1A),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.2),
+                              blurRadius: 10.w,
+                              offset: Offset(0, 5.w),
+                            ),
+                          ],
+                        ),
+                        alignment: Alignment.center,
+                        child: _isLoading
+                            ? SizedBox(
+                                height: 24.w,
+                                width: 24.w,
+                                child: CircularProgressIndicator(
+                                  color: isDark ? Colors.black : Colors.white,
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : Text(
+                                "Confirm Table Order",
+                                style: GoogleFonts.outfit(
+                                  fontSize: 18.sp,
+                                  fontWeight: FontWeight.bold,
+                                  color: isDark ? Colors.black : Colors.white,
+                                ),
+                              ),
+                      ),
+                    ),
+                    SizedBox(height: 30.w),
+                  ],
+                ),
+              );
+            },
           ),
         ],
       ),

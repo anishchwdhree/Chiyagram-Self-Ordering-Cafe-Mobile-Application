@@ -40,9 +40,17 @@ dependencies:
   flutter_staggered_animations: ^1.1.1
   provider: ^6.1.5+1
   lottie: ^3.3.2
-  flutter_native_splash: ^2.4.7
+
   intl: ^0.20.2
   shared_preferences: ^2.5.4
+  firebase_core: ^4.4.0
+  firebase_auth: ^6.1.4
+  google_sign_in: ^7.2.0
+  image_picker: ^1.2.1
+  firebase_storage: ^13.0.6
+  cloud_firestore: ^6.1.2
+  flutter_local_notifications: ^20.0.0
+  connectivity_plus: ^6.1.0
 
 dev_dependencies:
   flutter_test:
@@ -102,5 +110,7 @@ flutter:
   #       - asset: fonts/TrajanPro_Bold.ttf
   #         weight: 700
   #
-  # For details regarding fonts from package dependencies,
+  #For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+

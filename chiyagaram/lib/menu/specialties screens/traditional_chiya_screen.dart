@@ -6,6 +6,7 @@ import 'package:chiyagaram/models/cart_model.dart';
 import 'package:chiyagaram/theme/app_colors.dart';
 import 'package:chiyagaram/theme/theme_provider.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:chiyagaram/services/navigation_provider.dart';
 
 class TraditionalChiyaScreen extends StatelessWidget {
   const TraditionalChiyaScreen({super.key});
@@ -21,7 +22,7 @@ class TraditionalChiyaScreen extends StatelessWidget {
 
     final List<Map<String, dynamic>> chiyaItems = [
       {
-        'id': 'masala_chiya',
+        'id': 'Masala_chiya',
         'name': 'Masala Chiya',
         'price': 'Rs. 60',
         'image': 'images/masal.png',
@@ -30,7 +31,16 @@ class TraditionalChiyaScreen extends StatelessWidget {
         'color': const Color(0xFFD84315),
       },
       {
-        'id': 'black_tea',
+        'id': 'Matka_chiya',
+        'name': 'Matka Chiya',
+        'price': 'Rs. 60',
+        'image': 'images/mataka.png',
+        'description':
+            'Mataka Chiya delivers rich, flavorful tea in traditional clay pots',
+        'color': const Color(0xFF6D4C41),
+      },
+      {
+        'id': 'Black_tea',
         'name': 'Black Tea',
         'price': 'Rs. 40',
         'image': 'images/black.png',
@@ -41,20 +51,11 @@ class TraditionalChiyaScreen extends StatelessWidget {
       {
         'id': 'lemon_tea',
         'name': 'Lemon Tea',
-        'price': 'Rs. 45',
+        'price': 'Rs. 30',
         'image': 'images/leamon.png',
         'description':
             'Refreshing tea with a zesty hint of lemon, a perfect pick-me-up.',
         'color': const Color(0xFFF57C00),
-      },
-      {
-        'id': 'milk_tea',
-        'name': 'Milk Tea',
-        'price': 'Rs. 50',
-        'image': 'images/chiya.png',
-        'description':
-            'Creamy and smooth milk tea, a comforting classic for any time.',
-        'color': const Color(0xFF6D4C41),
       },
     ];
 
@@ -102,7 +103,14 @@ class TraditionalChiyaScreen extends StatelessWidget {
                           children: [
                             IconButton(
                               onPressed: () {
-                                // Navigate to cart if needed
+                                Provider.of<NavigationProvider>(
+                                  context,
+                                  listen: false,
+                                ).setIndex(2);
+                                Navigator.popUntil(
+                                  context,
+                                  (route) => route.isFirst,
+                                );
                               },
                               icon: Icon(
                                 Iconsax.shopping_bag,

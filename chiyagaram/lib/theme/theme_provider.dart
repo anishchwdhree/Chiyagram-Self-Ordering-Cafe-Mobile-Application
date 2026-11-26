@@ -3,7 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class ThemeProvider with ChangeNotifier {
   static const String _themeKey = "theme_mode";
-  ThemeMode _themeMode = ThemeMode.system;
+  ThemeMode _themeMode = ThemeMode.light;
 
   ThemeProvider() {
     _loadTheme();
@@ -13,7 +13,8 @@ class ThemeProvider with ChangeNotifier {
 
   bool get isDarkMode {
     if (_themeMode == ThemeMode.system) {
-      final brightness = WidgetsBinding.instance.platformDispatcher.platformBrightness;
+      final brightness =
+          WidgetsBinding.instance.platformDispatcher.platformBrightness;
       return brightness == Brightness.dark;
     }
     return _themeMode == ThemeMode.dark;
@@ -26,7 +27,9 @@ class ThemeProvider with ChangeNotifier {
   }
 
   void toggleSystemMode(bool useSystem) {
-    _themeMode = useSystem ? ThemeMode.system : (isDarkMode ? ThemeMode.dark : ThemeMode.light);
+    _themeMode = useSystem
+        ? ThemeMode.system
+        : (isDarkMode ? ThemeMode.dark : ThemeMode.light);
     _saveTheme();
     notifyListeners();
   }

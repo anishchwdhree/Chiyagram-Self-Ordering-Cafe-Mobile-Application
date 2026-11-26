@@ -41,7 +41,8 @@ class _MenuScreenState extends State<MenuScreen> {
           ),
 
           // 2. Content
-          SafeArea(
+          Padding(
+            padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -81,7 +82,7 @@ class _MenuScreenState extends State<MenuScreen> {
                 Expanded(
                   child: SingleChildScrollView(
                     physics: const BouncingScrollPhysics(),
-                    padding: EdgeInsets.only(bottom: 100.h), // Space for navbar
+                    padding: EdgeInsets.only(bottom: 110.h), // Space for navbar
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [

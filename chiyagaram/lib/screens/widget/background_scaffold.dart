@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:chiyagaram/theme/theme_provider.dart';
 import 'package:chiyagaram/theme/app_colors.dart';
 
+import 'package:flutter/services.dart';
+
 class BackgroundScaffold extends StatelessWidget {
   final Widget body;
   final PreferredSizeWidget? appBar;
@@ -10,6 +12,7 @@ class BackgroundScaffold extends StatelessWidget {
   final Widget? floatingActionButton;
   final bool extendBody;
   final bool extendBodyBehindAppBar;
+  final bool resizeToAvoidBottomInset;
 
   const BackgroundScaffold({
     super.key,
@@ -17,8 +20,9 @@ class BackgroundScaffold extends StatelessWidget {
     this.appBar,
     this.bottomNavigationBar,
     this.floatingActionButton,
-    this.extendBody = false,
-    this.extendBodyBehindAppBar = false,
+    this.extendBody = true,
+    this.extendBodyBehindAppBar = true,
+    this.resizeToAvoidBottomInset = false,
   });
 
   @override
@@ -26,9 +30,26 @@ class BackgroundScaffold extends StatelessWidget {
     return Consumer<ThemeProvider>(
       builder: (context, themeProvider, _) {
         final isDark = themeProvider.isDarkMode;
+
+        // Force edge-to-edge system UI style
+        SystemChrome.setSystemUIOverlayStyle(
+          SystemUiOverlayStyle(
+            statusBarColor: Colors.transparent,
+            statusBarIconBrightness: isDark
+                ? Brightness.light
+                : Brightness.dark,
+            systemNavigationBarColor: Colors.transparent,
+            systemNavigationBarIconBrightness: isDark
+                ? Brightness.light
+                : Brightness.dark,
+            systemNavigationBarDividerColor: Colors.transparent,
+          ),
+        );
+
         return Scaffold(
           extendBody: extendBody,
           extendBodyBehindAppBar: extendBodyBehindAppBar,
+          resizeToAvoidBottomInset: resizeToAvoidBottomInset,
           appBar: appBar,
           bottomNavigationBar: bottomNavigationBar,
           floatingActionButton: floatingActionButton,

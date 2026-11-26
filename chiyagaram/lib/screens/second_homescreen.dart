@@ -13,6 +13,8 @@ import 'package:provider/provider.dart';
 
 import 'package:chiyagaram/bottom%20bar%20screens/cart_screen.dart';
 import 'package:chiyagaram/screens/notification_screen.dart';
+import 'package:chiyagaram/services/notification_provider.dart';
+import 'package:chiyagaram/services/navigation_provider.dart';
 import 'package:chiyagaram/menu/menu_screen.dart';
 import 'package:chiyagaram/profile/profile_screen.dart';
 
@@ -24,13 +26,13 @@ class SecondHomescreen extends StatefulWidget {
 }
 
 class _SecondHomescreenState extends State<SecondHomescreen> {
-  int _currentIndex = 0;
   late PageController _pageController;
 
   @override
   void initState() {
     super.initState();
-    _pageController = PageController(initialPage: _currentIndex);
+    final navProvider = Provider.of<NavigationProvider>(context, listen: false);
+    _pageController = PageController(initialPage: navProvider.currentIndex);
   }
 
   @override
@@ -40,9 +42,7 @@ class _SecondHomescreenState extends State<SecondHomescreen> {
   }
 
   void _onPageChanged(int index) {
-    setState(() {
-      _currentIndex = index;
-    });
+    Provider.of<NavigationProvider>(context, listen: false).setIndex(index);
   }
 
   void _onNavBarTapped(int index) {
@@ -55,33 +55,48 @@ class _SecondHomescreenState extends State<SecondHomescreen> {
 
   @override
   Widget build(BuildContext context) {
-    return BackgroundScaffold(
-      body: Stack(
-        children: [
-          // PageView for Swipe Navigation
-          PageView(
-            controller: _pageController,
-            onPageChanged: _onPageChanged,
-            physics: const BouncingScrollPhysics(),
+    return Consumer<NavigationProvider>(
+      builder: (context, navProvider, child) {
+        // Ensure PageController is in sync with provider index
+        // This handles cases where index is changed from outside (e.g. specialty screens)
+        if (_pageController.hasClients &&
+            _pageController.page?.round() != navProvider.currentIndex) {
+          _pageController.animateToPage(
+            navProvider.currentIndex,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+          );
+        }
+
+        return BackgroundScaffold(
+          extendBodyBehindAppBar: true,
+          body: Stack(
             children: [
-              const HomeTab(),
-              const MenuScreen(), // Index 1
-              const CartScreen(), // Index 2
-              // LocationsScreen(), // Index 3
-              ProfileScreen(), // Index 3 (was 4)
+              // PageView for Swipe Navigation
+              PageView(
+                controller: _pageController,
+                onPageChanged: _onPageChanged,
+                physics: const BouncingScrollPhysics(),
+                children: [
+                  const HomeTab(),
+                  const MenuScreen(), // Index 1
+                  const CartScreen(), // Index 2
+                  ProfileScreen(), // Index 3 (was 4)
+                ],
+              ),
+
+              // Bottom Navigation Bar
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: GlassBottomNavBar(
+                  currentIndex: navProvider.currentIndex,
+                  onTap: _onNavBarTapped,
+                ),
+              ),
             ],
           ),
-
-          // Bottom Navigation Bar
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: GlassBottomNavBar(
-              currentIndex: _currentIndex,
-              onTap: _onNavBarTapped,
-            ),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
@@ -94,8 +109,6 @@ class HomeTab extends StatefulWidget {
 }
 
 class _HomeTabState extends State<HomeTab> {
-  int _notificationCount = 3; // Example initial count
-
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
@@ -137,122 +150,121 @@ class _HomeTabState extends State<HomeTab> {
           ],
         ),
 
-        // 3. Foreground Content
-        SafeArea(
-          child: SingleChildScrollView(
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 0.w, vertical: 10.h),
-              child: Column(
-                children: [
-                  Padding(
-                    padding: EdgeInsets.only(
-                      left: 2.w,
-                      right: 120.w,
-                      top: 10.h,
-                      bottom: 10.h,
+        // 2. Foreground Content
+        SingleChildScrollView(
+          padding: EdgeInsets.only(
+            top: MediaQuery.of(context).padding.top + 10.h,
+            bottom: 110.h,
+          ),
+          child: Column(
+            children: [
+              Padding(
+                padding: EdgeInsets.only(
+                  left: 2.w,
+                  right: 120.w,
+                  top: 10.h,
+                  bottom: 10.h,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(height: 2.h),
+                    Text(
+                      "Chiya Ki Tapari",
+                      style: GoogleFonts.philosopher(
+                        fontSize: 30.sp,
+                        fontWeight: FontWeight.w700,
+                        color: textColor,
+                        letterSpacing: -1.2,
+                        height: 1,
+                      ),
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SizedBox(height: 2.h),
-                        Text(
-                          "Chiyagram",
-                          style: GoogleFonts.philosopher(
-                            fontSize: 35.sp,
-                            fontWeight: FontWeight.w700,
-                            color: textColor,
-                            letterSpacing: -1.2,
-                            height: 1,
-                          ),
-                        ),
-                        SizedBox(height: 6.h),
-                        Text(
-                          "Brewing Happiness, One Cup at a Time",
-                          textAlign: TextAlign.left,
-                          style: GoogleFonts.outfit(
-                            fontSize: 10.sp,
-                            color: isDark
-                                ? AppColors.igTextSecondary
-                                : const Color(
-                                    0xFF795548,
-                                  ).withValues(alpha: 0.6),
-                            fontWeight: FontWeight.w500,
-                            letterSpacing: 0.8,
-                          ),
-                        ),
-                      ],
+                    SizedBox(height: 6.h),
+                    Text(
+                      "Brewing Happiness, One Cup at a Time",
+                      textAlign: TextAlign.left,
+                      style: GoogleFonts.outfit(
+                        fontSize: 13.sp,
+                        color: isDark
+                            ? AppColors.igTextSecondary
+                            : const Color(0xFF795548).withValues(alpha: 0.6),
+                        fontWeight: FontWeight.w500,
+                        letterSpacing: 0.4,
+                      ),
                     ),
-                  ),
-                  SizedBox(height: 40.h),
-                  const HeroCarousel(),
-                  const SizedBox(height: 30),
-                  RecommendationSection(isDark: isDark),
-                  SizedBox(height: 10.h),
-                  PopularSection(isDark: isDark),
-                  SizedBox(height: 40.h),
-                ],
+                  ],
+                ),
               ),
-            ),
+              SizedBox(height: 40.h),
+              const HeroCarousel(),
+              const SizedBox(height: 30),
+              RecommendationSection(isDark: isDark),
+              SizedBox(height: 10.h),
+              PopularSection(isDark: isDark),
+              SizedBox(height: 40.h),
+            ],
           ),
         ),
+
+        // 3. Notification Icon
         Positioned(
           top: 0,
           right: 0,
-          child: SafeArea(
-            child: Padding(
-              padding: EdgeInsets.only(top: 10.h, right: 20.w),
-              child: Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  IconButton(
-                    onPressed: () async {
-                      await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const NotificationScreen(),
-                        ),
-                      );
-                      // Clear badge on return
-                      if (mounted) {
-                        setState(() {
-                          _notificationCount = 0;
-                        });
-                      }
-                    },
-                    icon: Icon(
-                      Iconsax.notification,
-                      size: 28.sp,
-                      color: textColor,
+          child: Padding(
+            padding: EdgeInsets.only(
+              top: MediaQuery.of(context).padding.top + 10.h,
+              right: 20.w,
+            ),
+            child: Consumer<NotificationProvider>(
+              builder: (context, provider, child) {
+                return Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    IconButton(
+                      onPressed: () async {
+                        provider.markAllRead(); // Clear badge
+                        await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const NotificationScreen(),
+                          ),
+                        );
+                      },
+                      icon: Icon(
+                        Iconsax.notification,
+                        size: 28.sp,
+                        color: textColor,
+                      ),
                     ),
-                  ),
-                  if (_notificationCount > 0)
-                    Positioned(
-                      right: 8.w,
-                      top: 8.h,
-                      child: Container(
-                        padding: EdgeInsets.all(4.w),
-                        decoration: const BoxDecoration(
-                          color: Color(0xFFE91E63),
-                          shape: BoxShape.circle,
-                        ),
-                        constraints: BoxConstraints(
-                          minWidth: 16.w,
-                          minHeight: 16.w,
-                        ),
-                        child: Center(
-                          child: Text(
-                            '$_notificationCount',
-                            style: GoogleFonts.outfit(
-                              color: Colors.white,
-                              fontSize: 10.sp,
-                              fontWeight: FontWeight.bold,
+                    if (provider.unreadCount > 0)
+                      Positioned(
+                        right: 8.w,
+                        top: 8.h,
+                        child: Container(
+                          padding: EdgeInsets.all(4.w),
+                          decoration: const BoxDecoration(
+                            color: Color(0xFFE91E63),
+                            shape: BoxShape.circle,
+                          ),
+                          constraints: BoxConstraints(
+                            minWidth: 16.w,
+                            minHeight: 16.w,
+                          ),
+                          child: Center(
+                            child: Text(
+                              '${provider.unreadCount}',
+                              style: GoogleFonts.outfit(
+                                color: Colors.white,
+                                fontSize: 10.sp,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                ],
-              ),
+                  ],
+                );
+              },
             ),
           ),
         ),

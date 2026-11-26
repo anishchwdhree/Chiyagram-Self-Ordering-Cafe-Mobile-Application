@@ -1,3 +1,4 @@
+import 'package:chiyagaram/screens/widget/background_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:chiyagaram/responsive/size_config.dart';
@@ -17,75 +18,49 @@ class ContentScreen extends StatelessWidget {
     final isDark = themeProvider.isDarkMode;
     final textColor = isDark ? Colors.white : const Color(0xFF3E2723);
 
-    return Scaffold(
-      body: Stack(
-        children: [
-          // Background Gradient
-          RepaintBoundary(
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: isDark
-                      ? [
-                          AppColors.igBlack,
-                          AppColors.igDarkGrey,
-                          AppColors.igBlack,
-                        ]
-                      : [
-                          const Color(0xFFFFF3E0),
-                          const Color(0xFFFFECB3),
-                          const Color(0xFFFBE9E7),
-                        ],
+    return BackgroundScaffold(
+      body: SingleChildScrollView(
+        padding: EdgeInsets.symmetric(horizontal: 20.w).copyWith(
+          top: MediaQuery.of(context).padding.top + 10.h,
+          bottom: 20.h,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                IconButton(
+                  onPressed: () => Navigator.pop(context),
+                  icon: Icon(Icons.arrow_back_ios_new, color: textColor),
                 ),
-              ),
-              child: const SizedBox.expand(),
-            ),
-          ),
-          SafeArea(
-            child: SingleChildScrollView(
-              padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      IconButton(
-                        onPressed: () => Navigator.pop(context),
-                        icon: Icon(Icons.arrow_back_ios_new, color: textColor),
-                      ),
-                      Expanded(
-                        child: Text(
-                          title,
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.philosopher(
-                            fontSize: 20.sp,
-                            fontWeight: FontWeight.bold,
-                            color: textColor,
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: 40.w),
-                    ],
-                  ),
-                  SizedBox(height: 20.h),
-                  Text(
-                    content,
-                    style: GoogleFonts.outfit(
-                      fontSize: 16.sp,
-                      color: isDark
-                          ? AppColors.igTextSecondary
-                          : const Color(0xFF5D4037),
-                      height: 1.6,
+                Expanded(
+                  child: Text(
+                    title,
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.philosopher(
+                      fontSize: 20.sp,
+                      fontWeight: FontWeight.bold,
+                      color: textColor,
                     ),
                   ),
-                  SizedBox(height: 40.h),
-                ],
+                ),
+                SizedBox(width: 40.w),
+              ],
+            ),
+            SizedBox(height: 20.h),
+            Text(
+              content,
+              style: GoogleFonts.outfit(
+                fontSize: 16.sp,
+                color: isDark
+                    ? AppColors.igTextSecondary
+                    : const Color(0xFF5D4037),
+                height: 1.6,
               ),
             ),
-          ),
-        ],
+            SizedBox(height: 40.h),
+          ],
+        ),
       ),
     );
   }

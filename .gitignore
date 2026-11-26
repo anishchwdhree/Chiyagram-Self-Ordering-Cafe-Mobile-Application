@@ -1,0 +1,48 @@
+# IDE and Editor files
+.vscode/
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Sensitive Firebase & Service Credentials
+**/google-services.json
+!**/google-services.json.example
+**/GoogleService-Info.plist
+!**/GoogleService-Info.plist.example
+.firebaserc
+**/firebase-debug.log*
+**/firestore-debug.log*
+
+# Secret keys, keystores & Environment Variables
+*.env
+*.env.*
+*.key
+*.pem
+*.p12
+*.jks
+*.keystore
+key.properties
+local.properties
+
+# Build artifacts & caches
+**/build/
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+
+# Logs & Analysis outputs
+*.log
+*analysis_output.txt
+*full_analysis.txt
+*build_log.txt
+
+# Orchids / sandbox sync files
+.orchids/
+
+# OS specific files
+.DS_Store
+Thumbs.db
+Desktop.ini

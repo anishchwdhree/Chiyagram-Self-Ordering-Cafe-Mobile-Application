@@ -1,11 +1,13 @@
 import 'package:chiyagaram/screens/widget/background_scaffold.dart';
 import 'package:chiyagaram/theme/theme_provider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:chiyagaram/responsive/size_config.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class NotificationScreen extends StatefulWidget {
   const NotificationScreen({super.key});
@@ -18,54 +20,136 @@ class _NotificationScreenState extends State<NotificationScreen> {
   String _selectedFilter = 'All';
   final List<String> _filters = ['All', 'Orders', 'Offers', 'System'];
 
-  final List<Map<String, dynamic>> _allNotifications = [
-    {
-      'date': 'Today',
-      'items': [
-        {
-          'title': 'Order Accepted',
-          'body': 'Your order has been accepted.',
-          'time': '2 mins ago',
-          'icon': Iconsax.clipboard_tick,
-          'color': const Color(0xFF4CAF50), // Green
-          'isUnread': true,
+  bool _isLoading = true;
+  List<Map<String, dynamic>> _allNotifications = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchNotifications();
+  }
+
+  Future<void> _fetchNotifications() async {
+    final prefs = await SharedPreferences.getInstance();
+    final myOrders = prefs.getStringList('my_orders') ?? [];
+
+    if (myOrders.isEmpty) {
+      if (mounted) setState(() => _isLoading = false);
+      return;
+    }
+
+    try {
+      // Fetch orders. NOTE: whereIn is limited to 10 items.
+      // If user has > 10 orders, we might need to batch or just fetch the last 10.
+      // For now, let's take the last 10 IDs to avoid errors.
+      final idsToFetch = myOrders.length > 10
+          ? myOrders.sublist(myOrders.length - 10)
+          : myOrders;
+
+      final snapshot = await FirebaseFirestore.instance
+          .collection('orders')
+          .where('orderId', whereIn: idsToFetch)
+          .get();
+
+      List<Map<String, dynamic>> orderItems = [];
+
+      for (var doc in snapshot.docs) {
+        final data = doc.data();
+        orderItems.add({
+          'ids': data['orderId'], // Store ID for deletion
+          'title': 'Order ${data['status'].toString().toUpperCase()}',
+          'body': 'Order #${data['orderId']} is currently ${data['status']}',
+          'time': _formatTimestamp(data['timestamp']),
+          'icon': _getIconForStatus(data['status']),
+          'color': _getColorForStatus(data['status']),
+          'isUnread': data['status'] == 'completed' ? false : true,
           'category': 'Orders',
-        },
-        {
-          'title': 'Order Ready',
-          'body': 'Your Masala Chiya is ready to serve!',
-          'time': '15 mins ago',
-          'icon': Iconsax.coffee,
-          'color': const Color(0xFFFF9800), // Orange
-          'isUnread': true,
-          'category': 'Orders',
-        },
-        {
-          'title': 'Flash Sale!',
-          'body': 'Get 50% off on secondary snacks.',
-          'time': '1 hour ago',
-          'icon': Iconsax.discount_shape,
-          'color': const Color(0xFFE91E63), // Pink
-          'isUnread': false,
-          'category': 'Offers',
-        },
-      ],
-    },
-    {
-      'date': 'Yesterday',
-      'items': [
-        {
-          'title': 'System Maintenance',
-          'body': 'App scheduled for maintenance at 2 AM.',
-          'time': 'Yesterday',
-          'icon': Iconsax.setting_2,
-          'color': const Color(0xFF607D8B), // Blue Grey
-          'isUnread': false,
-          'category': 'System',
-        },
-      ],
-    },
-  ];
+          'timestamp': data['timestamp'], // for sorting
+        });
+      }
+
+      // precise sorting
+      orderItems.sort((a, b) {
+        // Handle null timestamps safely
+        if (a['timestamp'] == null) return -1;
+        if (b['timestamp'] == null) return 1;
+
+        final tA = (a['timestamp'] as Timestamp).toDate();
+        final tB = (b['timestamp'] as Timestamp).toDate();
+        return tB.compareTo(tA);
+      });
+
+      setState(() {
+        _allNotifications = [
+          {'date': 'Recent Updates', 'items': orderItems},
+        ];
+        _isLoading = false;
+      });
+    } catch (e) {
+      debugPrint('Error loading notifications: $e');
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _deleteNotification(String orderId) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final myOrders = prefs.getStringList('my_orders') ?? [];
+
+      // Remove the ID from the list
+      myOrders.remove(orderId);
+
+      // Save updated list back to SharedPreferences
+      await prefs.setStringList('my_orders', myOrders);
+
+      debugPrint('Deleted notification for order: $orderId');
+    } catch (e) {
+      debugPrint('Error deleting notification: $e');
+    }
+  }
+
+  IconData _getIconForStatus(String status) {
+    switch (status) {
+      case 'pending':
+        return Iconsax.timer;
+      case 'preparing':
+        return Iconsax.coffee;
+      case 'served':
+        return Iconsax.tick_circle;
+      case 'completed':
+        return Iconsax.clipboard_tick;
+      default:
+        return Iconsax.notification;
+    }
+  }
+
+  Color _getColorForStatus(String status) {
+    switch (status) {
+      case 'pending':
+        return Colors.orange;
+      case 'preparing':
+        return Colors.blue;
+      case 'served':
+        return Colors.green;
+      case 'completed':
+        return Colors.grey;
+      default:
+        return Colors.black;
+    }
+  }
+
+  String _formatTimestamp(dynamic timestamp) {
+    if (timestamp == null) return 'Just now';
+    if (timestamp is Timestamp) {
+      final now = DateTime.now();
+      final date = timestamp.toDate();
+      final diff = now.difference(date);
+      if (diff.inMinutes < 60) return '${diff.inMinutes} mins ago';
+      if (diff.inHours < 24) return '${diff.inHours} hours ago';
+      return '${date.day}/${date.month}';
+    }
+    return '';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -77,33 +161,45 @@ class _NotificationScreenState extends State<NotificationScreen> {
         : Colors.white.withValues(alpha: 0.5);
 
     return BackgroundScaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, color: textColor, size: 20.sp),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Text(
-          "Notifications",
-          style: GoogleFonts.philosopher(
-            fontSize: 24.sp,
-            fontWeight: FontWeight.bold,
-            color: textColor,
-          ),
-        ),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            onPressed: () {},
-            icon: Icon(Iconsax.tick_circle, color: textColor, size: 24.sp),
-            tooltip: "Mark all as read",
-          ),
-          SizedBox(width: 10.w),
-        ],
-      ),
       body: Column(
         children: [
+          SizedBox(height: MediaQuery.of(context).padding.top),
+          // Custom App Bar
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 10.h),
+            child: Row(
+              children: [
+                IconButton(
+                  onPressed: () => Navigator.pop(context),
+                  icon: Icon(
+                    Icons.arrow_back_ios_new,
+                    color: textColor,
+                    size: 20.sp,
+                  ),
+                ),
+                Expanded(
+                  child: Text(
+                    "Notifications",
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.philosopher(
+                      fontSize: 24.sp,
+                      fontWeight: FontWeight.bold,
+                      color: textColor,
+                    ),
+                  ),
+                ),
+                IconButton(
+                  onPressed: () {},
+                  icon: Icon(
+                    Iconsax.tick_circle,
+                    color: textColor,
+                    size: 24.sp,
+                  ),
+                  tooltip: "Mark all as read",
+                ),
+              ],
+            ),
+          ),
           // 1. Category Filters
           SizedBox(height: 10.h),
           SizedBox(
@@ -157,7 +253,11 @@ class _NotificationScreenState extends State<NotificationScreen> {
           SizedBox(height: 20.h),
 
           // 2. Notification List
-          Expanded(child: _buildGroupedList(isDark, textColor, cardColor)),
+          Expanded(
+            child: _isLoading
+                ? Center(child: CircularProgressIndicator(color: textColor))
+                : _buildGroupedList(isDark, textColor, cardColor),
+          ),
         ],
       ),
     );
@@ -166,9 +266,10 @@ class _NotificationScreenState extends State<NotificationScreen> {
   Widget _buildGroupedList(bool isDark, Color textColor, Color cardColor) {
     List<Widget> listWidgets = [];
 
-    for (var group in _allNotifications) {
-      String date = group['date'];
-      List<Map<String, dynamic>> items = group['items'];
+    for (var i = 0; i < _allNotifications.length; i++) {
+      final group = _allNotifications[i];
+      final date = group['date'];
+      final items = group['items'] as List<Map<String, dynamic>>;
 
       var filteredItems = items.where((item) {
         if (_selectedFilter == 'All') return true;
@@ -191,15 +292,27 @@ class _NotificationScreenState extends State<NotificationScreen> {
           ),
         );
 
-        for (var i = 0; i < filteredItems.length; i++) {
+        for (var j = 0; j < filteredItems.length; j++) {
           listWidgets.add(
             Padding(
               padding: EdgeInsets.fromLTRB(20.w, 0, 20.w, 16.h),
               child: _buildNotificationItem(
-                filteredItems[i],
+                filteredItems[j],
                 isDark,
                 textColor,
                 cardColor,
+                () {
+                  // Remove from UI immediately
+                  setState(() {
+                    // Find the original list and remove the item
+                    items.remove(filteredItems[j]);
+                    if (items.isEmpty) {
+                      _allNotifications.removeAt(i);
+                    }
+                  });
+                  // Delete from storage
+                  _deleteNotification(filteredItems[j]['ids']);
+                },
               ),
             ),
           );
@@ -254,12 +367,13 @@ class _NotificationScreenState extends State<NotificationScreen> {
     bool isDark,
     Color textColor,
     Color cardColor,
+    VoidCallback onDismiss,
   ) {
     return Dismissible(
-      key: UniqueKey(),
+      key: Key(data['ids'].toString()), // Unique Key based on ID
       direction: DismissDirection.endToStart,
       onDismissed: (direction) {
-        // Handle delete
+        onDismiss();
       },
       background: Container(
         alignment: Alignment.centerRight,

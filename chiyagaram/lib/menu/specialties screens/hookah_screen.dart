@@ -7,6 +7,8 @@ import 'package:chiyagaram/theme/app_colors.dart';
 import 'package:chiyagaram/theme/theme_provider.dart';
 import 'package:iconsax/iconsax.dart';
 
+import 'package:chiyagaram/services/navigation_provider.dart';
+
 class HookahScreen extends StatelessWidget {
   const HookahScreen({super.key});
 
@@ -97,7 +99,16 @@ class HookahScreen extends StatelessWidget {
                         return Stack(
                           children: [
                             IconButton(
-                              onPressed: () {},
+                              onPressed: () {
+                                Provider.of<NavigationProvider>(
+                                  context,
+                                  listen: false,
+                                ).setIndex(2);
+                                Navigator.popUntil(
+                                  context,
+                                  (route) => route.isFirst,
+                                );
+                              },
                               icon: Icon(
                                 Iconsax.shopping_bag,
                                 color: textColor,

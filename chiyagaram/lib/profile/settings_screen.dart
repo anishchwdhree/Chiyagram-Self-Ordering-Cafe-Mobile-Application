@@ -32,198 +32,199 @@ class _SettingsScreenState extends State<SettingsScreen> {
         : Colors.white.withValues(alpha: 0.6);
 
     return BackgroundScaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Custom App Bar
-              Row(
-                children: [
-                  IconButton(
-                    onPressed: () => Navigator.pop(context),
-                    icon: Icon(Icons.arrow_back_ios_new, color: textColor),
-                  ),
-                  Expanded(
-                    child: Text(
-                      "Settings",
-                      textAlign: TextAlign.center,
-                      style: GoogleFonts.philosopher(
-                        fontSize: 20.sp,
-                        fontWeight: FontWeight.bold,
-                        color: textColor,
-                      ),
+      body: SingleChildScrollView(
+        padding: EdgeInsets.symmetric(horizontal: 20.w).copyWith(
+          top: MediaQuery.of(context).padding.top + 10.h,
+          bottom: 20.h,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Custom App Bar
+            Row(
+              children: [
+                IconButton(
+                  onPressed: () => Navigator.pop(context),
+                  icon: Icon(Icons.arrow_back_ios_new, color: textColor),
+                ),
+                Expanded(
+                  child: Text(
+                    "Settings",
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.philosopher(
+                      fontSize: 20.sp,
+                      fontWeight: FontWeight.bold,
+                      color: textColor,
                     ),
-                  ),
-                  SizedBox(width: 40.w), // Balance back button
-                ],
-              ),
-              SizedBox(height: 20.h),
-
-              // Account Settings
-              _buildSectionHeader("Account", textColor),
-              _buildArrowOption(
-                title: "Change Password",
-                icon: Iconsax.lock,
-                textColor: textColor,
-                cardColor: cardColor,
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const ChangePasswordScreen(),
-                    ),
-                  );
-                },
-              ),
-              SizedBox(height: 12.h),
-              _buildArrowOption(
-                title: "Delete Account",
-                icon: Iconsax.trash,
-                isDestructive: true,
-                textColor: textColor,
-                cardColor: cardColor,
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const DeleteAccountScreen(),
-                    ),
-                  );
-                },
-              ),
-              SizedBox(height: 24.h),
-
-              _buildSectionHeader("App Settings", textColor),
-              _buildSwitchOption(
-                title: "Use System Theme",
-                icon: Iconsax.setting_2,
-                value: themeProvider.themeMode == ThemeMode.system,
-                textColor: textColor,
-                cardColor: cardColor,
-                onChanged: (value) {
-                  themeProvider.toggleSystemMode(value);
-                },
-              ),
-              SizedBox(height: 12.h),
-              _buildSwitchOption(
-                title: "Dark Mode",
-                icon: Iconsax.moon,
-                value: themeProvider.isDarkMode,
-                textColor: textColor,
-                cardColor: cardColor,
-                enabled: themeProvider.themeMode != ThemeMode.system,
-                onChanged: (value) {
-                  themeProvider.toggleTheme(value);
-                },
-              ),
-              SizedBox(height: 12.h),
-
-              _buildArrowOption(
-                title: "Language",
-                icon: Iconsax.global,
-                trailingText: "English",
-                textColor: textColor,
-                cardColor: cardColor,
-                onTap: () {},
-              ),
-              SizedBox(height: 24.h),
-
-              // Support
-              _buildSectionHeader("Support", textColor),
-              _buildArrowOption(
-                title: "Help Center",
-                icon: Iconsax.message_question,
-                textColor: textColor,
-                cardColor: cardColor,
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const HelpSupportScreen(),
-                    ),
-                  );
-                },
-              ),
-              SizedBox(height: 12.h),
-              _buildArrowOption(
-                title: "Feedback",
-                icon: Iconsax.message_edit,
-                textColor: textColor,
-                cardColor: cardColor,
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const FeedbackScreen(),
-                    ),
-                  );
-                },
-              ),
-              SizedBox(height: 12.h),
-              _buildArrowOption(
-                title: "Privacy Policy",
-                icon: Iconsax.security_safe,
-                textColor: textColor,
-                cardColor: cardColor,
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const PrivacyPolicyScreen(),
-                    ),
-                  );
-                },
-              ),
-              SizedBox(height: 12.h),
-              _buildArrowOption(
-                title: "Terms of Service",
-                icon: Iconsax.document_text,
-                textColor: textColor,
-                cardColor: cardColor,
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const TermsOfServiceScreen(),
-                    ),
-                  );
-                },
-              ),
-              SizedBox(height: 12.h),
-              _buildArrowOption(
-                title: "About App",
-                icon: Iconsax.info_circle,
-                textColor: textColor,
-                cardColor: cardColor,
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const ContentScreen(
-                        title: "About App",
-                        content:
-                            "ChiyaGram v1.0.0\n\nA modern cafe application for self-ordering and managing your favorite snacks and beverages.",
-                      ),
-                    ),
-                  );
-                },
-              ),
-
-              SizedBox(height: 40.h),
-              Center(
-                child: Text(
-                  "Version 1.0.0",
-                  style: GoogleFonts.outfit(
-                    fontSize: 12.sp,
-                    color: textColor.withValues(alpha: 0.5),
                   ),
                 ),
+                SizedBox(width: 40.w), // Balance back button
+              ],
+            ),
+            SizedBox(height: 20.h),
+
+            // Account Settings
+            _buildSectionHeader("Account", textColor),
+            _buildArrowOption(
+              title: "Change Password",
+              icon: Iconsax.lock,
+              textColor: textColor,
+              cardColor: cardColor,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ChangePasswordScreen(),
+                  ),
+                );
+              },
+            ),
+            SizedBox(height: 12.h),
+            _buildArrowOption(
+              title: "Delete Account",
+              icon: Iconsax.trash,
+              isDestructive: true,
+              textColor: textColor,
+              cardColor: cardColor,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const DeleteAccountScreen(),
+                  ),
+                );
+              },
+            ),
+            SizedBox(height: 24.h),
+
+            _buildSectionHeader("App Settings", textColor),
+            _buildSwitchOption(
+              title: "Use System Theme",
+              icon: Iconsax.setting_2,
+              value: themeProvider.themeMode == ThemeMode.system,
+              textColor: textColor,
+              cardColor: cardColor,
+              onChanged: (value) {
+                themeProvider.toggleSystemMode(value);
+              },
+            ),
+            SizedBox(height: 12.h),
+            _buildSwitchOption(
+              title: "Dark Mode",
+              icon: Iconsax.moon,
+              value: themeProvider.isDarkMode,
+              textColor: textColor,
+              cardColor: cardColor,
+              enabled: themeProvider.themeMode != ThemeMode.system,
+              onChanged: (value) {
+                themeProvider.toggleTheme(value);
+              },
+            ),
+            SizedBox(height: 12.h),
+
+            _buildArrowOption(
+              title: "Language",
+              icon: Iconsax.global,
+              trailingText: "English",
+              textColor: textColor,
+              cardColor: cardColor,
+              onTap: () {},
+            ),
+            SizedBox(height: 24.h),
+
+            // Support
+            _buildSectionHeader("Support", textColor),
+            _buildArrowOption(
+              title: "Help Center",
+              icon: Iconsax.message_question,
+              textColor: textColor,
+              cardColor: cardColor,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const HelpSupportScreen(),
+                  ),
+                );
+              },
+            ),
+            SizedBox(height: 12.h),
+            _buildArrowOption(
+              title: "Feedback",
+              icon: Iconsax.message_edit,
+              textColor: textColor,
+              cardColor: cardColor,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const FeedbackScreen(),
+                  ),
+                );
+              },
+            ),
+            SizedBox(height: 12.h),
+            _buildArrowOption(
+              title: "Privacy Policy",
+              icon: Iconsax.security_safe,
+              textColor: textColor,
+              cardColor: cardColor,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const PrivacyPolicyScreen(),
+                  ),
+                );
+              },
+            ),
+            SizedBox(height: 12.h),
+            _buildArrowOption(
+              title: "Terms of Service",
+              icon: Iconsax.document_text,
+              textColor: textColor,
+              cardColor: cardColor,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const TermsOfServiceScreen(),
+                  ),
+                );
+              },
+            ),
+            SizedBox(height: 12.h),
+            _buildArrowOption(
+              title: "About App",
+              icon: Iconsax.info_circle,
+              textColor: textColor,
+              cardColor: cardColor,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ContentScreen(
+                      title: "About App",
+                      content:
+                          "Chiya Ki Tapari v1.0.0\n\nA modern cafe application for self-ordering and managing your favorite snacks and beverages.",
+                    ),
+                  ),
+                );
+              },
+            ),
+
+            SizedBox(height: 40.h),
+            Center(
+              child: Text(
+                "Version 1.0.0",
+                style: GoogleFonts.outfit(
+                  fontSize: 12.sp,
+                  color: textColor.withValues(alpha: 0.5),
+                ),
               ),
-              SizedBox(height: 20.h),
-            ],
-          ),
+            ),
+            SizedBox(height: 20.h),
+          ],
         ),
       ),
     );

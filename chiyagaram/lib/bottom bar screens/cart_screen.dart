@@ -12,9 +12,14 @@ import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:lottie/lottie.dart';
 import 'package:iconsax/iconsax.dart';
 
-class CartScreen extends StatelessWidget {
+class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
 
+  @override
+  State<CartScreen> createState() => _CartScreenState();
+}
+
+class _CartScreenState extends State<CartScreen> {
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
@@ -65,7 +70,10 @@ class CartScreen extends StatelessWidget {
           ),
 
           // 2. Cart Content
-          SafeArea(
+          Padding(
+            padding: EdgeInsets.only(
+              top: MediaQuery.of(context).padding.top + kToolbarHeight,
+            ),
             child: Consumer<CartModel>(
               builder: (context, cart, child) {
                 if (cart.items.isEmpty) {
@@ -141,15 +149,7 @@ class CartScreen extends StatelessWidget {
                       ),
                     ),
                     // Total and Checkout
-                    Padding(
-                      padding: EdgeInsets.only(bottom: 100.w),
-                      child: _buildCheckoutSection(
-                        context,
-                        cart,
-                        isDark,
-                        textColor,
-                      ),
-                    ),
+                    _buildCheckoutSection(context, cart, isDark, textColor),
                   ],
                 );
               },
@@ -437,94 +437,87 @@ class CartScreen extends StatelessWidget {
             ),
           ],
         ),
-        child: SafeArea(
-          top: false,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Cost Breakdown
-              _buildSummaryRow("Sub total", cart.subTotal, isDark, textColor),
-              SizedBox(height: 6.h),
-              _buildSummaryRow(
-                "Serving Fee",
-                cart.servingFee,
-                isDark,
-                textColor,
-              ),
-              SizedBox(height: 8.h),
-              // Divider
-              Divider(
-                color: (isDark ? AppColors.igBorder : const Color(0xFF5D4037))
-                    .withValues(alpha: 0.2),
-                thickness: 1,
-              ),
-              SizedBox(height: 8.h),
-              // Grand Total
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "Total",
-                    style: GoogleFonts.philosopher(
-                      fontSize: 22.sp,
-                      fontWeight: FontWeight.bold,
-                      color: textColor,
-                    ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Cost Breakdown
+            _buildSummaryRow("Sub total", cart.subTotal, isDark, textColor),
+            SizedBox(height: 6.h),
+            _buildSummaryRow("Serving Fee", cart.servingFee, isDark, textColor),
+            SizedBox(height: 8.h),
+            // Divider
+            Divider(
+              color: (isDark ? AppColors.igBorder : const Color(0xFF5D4037))
+                  .withValues(alpha: 0.2),
+              thickness: 1,
+            ),
+            SizedBox(height: 8.h),
+            // Grand Total
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "Total",
+                  style: GoogleFonts.philosopher(
+                    fontSize: 22.sp,
+                    fontWeight: FontWeight.bold,
+                    color: textColor,
                   ),
-                  Text(
-                    "Rs. ${cart.grandTotal.toStringAsFixed(0)}",
-                    style: GoogleFonts.philosopher(
-                      fontSize: 26.sp,
-                      fontWeight: FontWeight.bold,
-                      color: textColor,
-                    ),
+                ),
+                Text(
+                  "Rs. ${cart.grandTotal.toStringAsFixed(0)}",
+                  style: GoogleFonts.philosopher(
+                    fontSize: 26.sp,
+                    fontWeight: FontWeight.bold,
+                    color: textColor,
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 12.h),
+            // Checkout Button
+            Container(
+              width: double.infinity,
+              height: 45.w,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(30.w),
+                color: isDark ? Colors.white : const Color(0xFF1A1A1A),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.2),
+                    blurRadius: 10.w,
+                    offset: Offset(0, 5.w),
                   ),
                 ],
               ),
-              SizedBox(height: 12.h),
-              // Checkout Button
-              Container(
-                width: double.infinity,
-                height: 45.w,
-                decoration: BoxDecoration(
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const CheckoutScreen(),
+                      ),
+                    );
+                  },
                   borderRadius: BorderRadius.circular(30.w),
-                  color: isDark ? Colors.white : const Color(0xFF1A1A1A),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.2),
-                      blurRadius: 10.w,
-                      offset: Offset(0, 5.w),
-                    ),
-                  ],
-                ),
-                child: Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const CheckoutScreen(),
-                        ),
-                      );
-                    },
-                    borderRadius: BorderRadius.circular(30.w),
-                    child: Center(
-                      child: Text(
-                        "Checkout",
-                        style: GoogleFonts.outfit(
-                          fontSize: 18.sp,
-                          fontWeight: FontWeight.w600,
-                          color: isDark ? Colors.black : Colors.white,
-                          letterSpacing: 0.5,
-                        ),
+                  child: Center(
+                    child: Text(
+                      "Checkout",
+                      style: GoogleFonts.outfit(
+                        fontSize: 18.sp,
+                        fontWeight: FontWeight.w600,
+                        color: isDark ? Colors.black : Colors.white,
+                        letterSpacing: 0.5,
                       ),
                     ),
                   ),
                 ),
               ),
-            ],
-          ),
+            ),
+            SizedBox(height: MediaQuery.of(context).padding.bottom + 115.h),
+          ],
         ),
       ),
     );

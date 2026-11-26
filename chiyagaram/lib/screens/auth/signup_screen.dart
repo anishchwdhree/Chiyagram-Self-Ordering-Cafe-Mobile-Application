@@ -5,7 +5,10 @@ import 'package:provider/provider.dart';
 import 'package:chiyagaram/animations/fade_animation.dart';
 import 'package:chiyagaram/responsive/size_config.dart';
 import 'package:chiyagaram/screens/second_homescreen.dart';
+import 'package:chiyagaram/services/google_auth_service.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class SignupScreen extends StatefulWidget {
@@ -20,6 +23,58 @@ class _SignupScreenState extends State<SignupScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isLoading = false;
+  bool _isPasswordVisible = false;
+
+  // Password Strength Variables
+  bool _hasUpperCase = false;
+  bool _hasLowerCase = false;
+  bool _hasDigits = false;
+  bool _hasSpecialCharacters = false;
+  bool _hasMinLength = false;
+  double _strengthScore = 0.0;
+  String _strengthText = "Weak";
+  Color _strengthColor = Colors.red;
+
+  @override
+  void initState() {
+    super.initState();
+    _passwordController.addListener(_updatePasswordStrength);
+  }
+
+  void _updatePasswordStrength() {
+    final password = _passwordController.text;
+    if (mounted) {
+      setState(() {
+        _hasUpperCase = password.contains(RegExp(r'[A-Z]'));
+        _hasLowerCase = password.contains(RegExp(r'[a-z]'));
+        _hasDigits = password.contains(RegExp(r'[0-9]'));
+        _hasSpecialCharacters = password.contains(
+          RegExp(r'[!@#$%^&*(),.?":{}|<>]'),
+        );
+        _hasMinLength = password.length >= 6;
+
+        int criteriaMet = 0;
+        if (_hasUpperCase) criteriaMet++;
+        if (_hasLowerCase) criteriaMet++;
+        if (_hasDigits) criteriaMet++;
+        if (_hasSpecialCharacters) criteriaMet++;
+        if (_hasMinLength) criteriaMet++;
+
+        _strengthScore = criteriaMet / 5;
+
+        if (criteriaMet <= 2) {
+          _strengthText = "Weak";
+          _strengthColor = Colors.red;
+        } else if (criteriaMet == 3) {
+          _strengthText = "Medium";
+          _strengthColor = Colors.orange;
+        } else {
+          _strengthText = "Strong";
+          _strengthColor = Colors.green;
+        }
+      });
+    }
+  }
 
   @override
   void dispose() {
@@ -39,43 +94,39 @@ class _SignupScreenState extends State<SignupScreen> {
         : const Color(0xFF795548).withValues(alpha: 0.5);
 
     return BackgroundScaffold(
-      body: SafeArea(
-        child: SizedBox(
-          height: MediaQuery.of(context).size.height,
-          width: MediaQuery.of(context).size.width,
-          child: Column(
-            children: [
-              Expanded(
-                child: SingleChildScrollView(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 24.w,
-                    vertical: 24.h,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      IconButton(
-                        onPressed: () => Navigator.pop(context),
-                        icon: Icon(Icons.arrow_back_ios, color: textColor),
-                      ),
-                      SizedBox(height: 20.h),
-                      _buildHeader(textColor, subTextColor),
-                      SizedBox(height: 40.h),
-                      _buildSignupForm(isDark, textColor),
-                      SizedBox(height: 40.h),
-                      _buildSignupButton(isDark),
-                      SizedBox(height: 30.h),
-                      _buildDivider(isDark),
-                      SizedBox(height: 30.h),
-                      _buildSocialButtons(isDark),
-                      SizedBox(height: 40.h),
-                      _buildLoginLink(isDark),
-                    ],
-                  ),
+      body: SizedBox(
+        height: MediaQuery.of(context).size.height,
+        width: MediaQuery.of(context).size.width,
+        child: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 24.h),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(height: MediaQuery.of(context).padding.top),
+                    IconButton(
+                      onPressed: () => Navigator.pop(context),
+                      icon: Icon(Icons.arrow_back_ios, color: textColor),
+                    ),
+                    SizedBox(height: 10.h),
+                    _buildHeader(textColor, subTextColor),
+                    SizedBox(height: 40.h),
+                    _buildSignupForm(isDark, textColor),
+                    SizedBox(height: 40.h),
+                    _buildSignupButton(isDark),
+                    SizedBox(height: 30.h),
+                    _buildDivider(isDark),
+                    SizedBox(height: 30.h),
+                    _buildSocialButtons(isDark),
+                    SizedBox(height: 40.h),
+                    _buildLoginLink(isDark),
+                  ],
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -142,12 +193,25 @@ class _SignupScreenState extends State<SignupScreen> {
             controller: _passwordController,
             label: "Password",
             hint: "Create a password",
-            isPassword: true,
+            obscureText: !_isPasswordVisible,
             icon: Icons.lock_outline,
             isDark: isDark,
             textColor: textColor,
+            suffixIcon: IconButton(
+              icon: Icon(
+                _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                color: isDark ? Colors.white70 : AppColors.mediumBrown,
+              ),
+              onPressed: () {
+                setState(() {
+                  _isPasswordVisible = !_isPasswordVisible;
+                });
+              },
+            ),
           ),
         ),
+        SizedBox(height: 20.h),
+        _buildPasswordStrengthIndicator(isDark),
       ],
     );
   }
@@ -159,11 +223,45 @@ class _SignupScreenState extends State<SignupScreen> {
         width: double.infinity,
         height: 45.h,
         child: ElevatedButton(
-          onPressed: () {
+          onPressed: () async {
+            if (_nameController.text.isEmpty ||
+                _emailController.text.isEmpty ||
+                _passwordController.text.isEmpty) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Please fill in all fields')),
+              );
+              return;
+            }
+
             setState(() {
               _isLoading = true;
             });
-            Future.delayed(const Duration(seconds: 2), () {
+
+            try {
+              UserCredential userCredential = await FirebaseAuth.instance
+                  .createUserWithEmailAndPassword(
+                    email: _emailController.text.trim(),
+                    password: _passwordController.text.trim(),
+                  );
+
+              // Update display name
+              await userCredential.user?.updateDisplayName(
+                _nameController.text.trim(),
+              );
+
+              // Create user document in Firestore with 'user' role
+              if (userCredential.user != null) {
+                await FirebaseFirestore.instance
+                    .collection('users')
+                    .doc(userCredential.user!.uid)
+                    .set({
+                      'role': 'user',
+                      'email': _emailController.text.trim(),
+                      'displayName': _nameController.text.trim(),
+                      'createdAt': FieldValue.serverTimestamp(),
+                    });
+              }
+
               if (mounted) {
                 setState(() {
                   _isLoading = false;
@@ -175,7 +273,41 @@ class _SignupScreenState extends State<SignupScreen> {
                   ),
                 );
               }
-            });
+            } on FirebaseAuthException catch (e) {
+              if (mounted) {
+                setState(() {
+                  _isLoading = false;
+                });
+                String message = 'An error occurred';
+                if (e.code == 'weak-password') {
+                  message = 'Password should be at least 6 characters.';
+                } else if (e.code == 'email-already-in-use') {
+                  message = 'An account already exists for this email.';
+                } else if (e.code == 'invalid-email') {
+                  message = 'Please enter a valid email address.';
+                } else if (e.code == 'network-request-failed') {
+                  message = 'Network error. Please check your connection.';
+                } else {
+                  message = e.message ?? message;
+                }
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(message),
+                    backgroundColor: Colors.redAccent,
+                    behavior: SnackBarBehavior.floating,
+                  ),
+                );
+              }
+            } catch (e) {
+              if (mounted) {
+                setState(() {
+                  _isLoading = false;
+                });
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(SnackBar(content: Text(e.toString())));
+              }
+            }
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: isDark
@@ -239,7 +371,29 @@ class _SignupScreenState extends State<SignupScreen> {
           imagePath: "images/Google.png",
           label: "Continue with Google",
           isDark: isDark,
-          onTap: () {},
+          onTap: () async {
+            try {
+              final userCredential = await GoogleAuthService()
+                  .signInWithGoogle();
+
+              if (userCredential != null && mounted) {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const SecondHomescreen(),
+                  ),
+                );
+              }
+            } catch (e) {
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Google Sign-In failed: ${e.toString()}'),
+                  ),
+                );
+              }
+            }
+          },
         ),
       ),
     );
@@ -275,25 +429,71 @@ class _SignupScreenState extends State<SignupScreen> {
       ),
     );
   }
+
+  Widget _buildPasswordStrengthIndicator(bool isDark) {
+    if (_passwordController.text.isEmpty) return const SizedBox.shrink();
+
+    return FadeAnimation(
+      delay: 0.6,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "Password Strength",
+                style: GoogleFonts.outfit(
+                  fontSize: 12.sp,
+                  fontWeight: FontWeight.w500,
+                  color: isDark ? Colors.white54 : Colors.black54,
+                ),
+              ),
+              Text(
+                _strengthText,
+                style: GoogleFonts.outfit(
+                  fontSize: 12.sp,
+                  fontWeight: FontWeight.bold,
+                  color: _strengthColor,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 6.h),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child: LinearProgressIndicator(
+              value: _strengthScore,
+              backgroundColor: isDark ? Colors.white10 : Colors.grey.shade300,
+              color: _strengthColor,
+              minHeight: 4.h,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class _CustomTextField extends StatelessWidget {
   final String label;
   final String hint;
-  final bool isPassword;
+  final bool obscureText;
   final IconData icon;
   final TextEditingController controller;
   final bool isDark;
   final Color textColor;
+  final Widget? suffixIcon;
 
   const _CustomTextField({
     required this.label,
     required this.hint,
-    this.isPassword = false,
+    this.obscureText = false,
     required this.icon,
     required this.controller,
     required this.isDark,
     required this.textColor,
+    this.suffixIcon,
   });
 
   @override
@@ -325,7 +525,7 @@ class _CustomTextField extends StatelessWidget {
           ),
           child: TextField(
             controller: controller,
-            obscureText: isPassword,
+            obscureText: obscureText,
             style: GoogleFonts.inter(
               fontSize: 16.sp,
               color: isDark ? Colors.white : Colors.black87,
@@ -339,6 +539,7 @@ class _CustomTextField extends StatelessWidget {
                 icon,
                 color: isDark ? Colors.white70 : AppColors.mediumBrown,
               ),
+              suffixIcon: suffixIcon,
               border: InputBorder.none,
               contentPadding: EdgeInsets.symmetric(
                 horizontal: 20.w,

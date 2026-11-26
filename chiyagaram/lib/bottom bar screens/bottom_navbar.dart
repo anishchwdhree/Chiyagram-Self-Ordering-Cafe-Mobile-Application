@@ -26,72 +26,87 @@ class _GlassBottomNavBarState extends State<GlassBottomNavBar> {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isDark = themeProvider.isDarkMode;
 
-    return Padding(
-      padding: EdgeInsets.fromLTRB(20.w, 0, 20.w, 20.h),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(40.w),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
-          child: Container(
-            height: 72.h,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: isDark
-                    ? [
-                        Colors.black.withValues(alpha: 0.8),
-                        Colors.black.withValues(alpha: 0.6),
-                        Colors.black.withValues(alpha: 0.4),
-                      ]
-                    : [
-                        Colors.white.withValues(alpha: 0.6),
-                        Colors.white.withValues(alpha: 0.1),
-                        Colors.white.withValues(alpha: 0.05),
-                      ],
-                stops: const [0.0, 0.3, 1.0],
-              ),
-              borderRadius: BorderRadius.circular(40.w),
-              border: Border.all(
-                color: isDark
-                    ? Colors.white.withValues(alpha: 0.1)
-                    : Colors.white.withValues(alpha: 0.3),
-                width: 1.0.w,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.1),
-                  blurRadius: 20.w,
-                  spreadRadius: -2.w,
-                  offset: Offset(0, 10.h),
+    return SafeArea(
+      bottom: true,
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(20.w, 0, 20.w, 20.h),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(40.w),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
+            child: Container(
+              height: 72.h,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: isDark
+                      ? [
+                          Colors.black.withValues(alpha: 0.8),
+                          Colors.black.withValues(alpha: 0.6),
+                          Colors.black.withValues(alpha: 0.4),
+                        ]
+                      : [
+                          Colors.white.withValues(alpha: 0.6),
+                          Colors.white.withValues(alpha: 0.1),
+                          Colors.white.withValues(alpha: 0.05),
+                        ],
+                  stops: const [0.0, 0.3, 1.0],
                 ),
-              ],
-            ),
-            child: Consumer<CartModel>(
-              builder: (context, cart, child) {
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    _buildNavItem(Iconsax.home, Iconsax.home5, 0, null, isDark),
-                    _buildNavItem(
-                      Iconsax.menu_board,
-                      Iconsax.menu_board5,
-                      1,
-                      null,
-                      isDark,
-                    ),
-                    _buildNavItem(
-                      Iconsax.shopping_cart,
-                      Iconsax.shopping_cart5,
-                      2,
-                      cart.itemCount,
-                      isDark,
-                    ),
-                    // _buildNavItem(Iconsax.location, Iconsax.location, 3, null),
-                    _buildNavItem(Iconsax.user, Iconsax.user, 3, null, isDark),
-                  ],
-                );
-              },
+                borderRadius: BorderRadius.circular(40.w),
+                border: Border.all(
+                  color: isDark
+                      ? Colors.white.withValues(alpha: 0.1)
+                      : Colors.white.withValues(alpha: 0.3),
+                  width: 1.0.w,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.1),
+                    blurRadius: 20.w,
+                    spreadRadius: -2.w,
+                    offset: Offset(0, 10.h),
+                  ),
+                ],
+              ),
+              child: Consumer<CartModel>(
+                builder: (context, cart, child) {
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      _buildNavItem(
+                        Iconsax.home,
+                        Iconsax.home5,
+                        0,
+                        null,
+                        isDark,
+                      ),
+                      _buildNavItem(
+                        Iconsax.menu_board,
+                        Iconsax.menu_board5,
+                        1,
+                        null,
+                        isDark,
+                      ),
+                      _buildNavItem(
+                        Iconsax.shopping_cart,
+                        Iconsax.shopping_cart5,
+                        2,
+                        cart.itemCount,
+                        isDark,
+                      ),
+                      // _buildNavItem(Iconsax.location, Iconsax.location, 3, null),
+                      _buildNavItem(
+                        Iconsax.user,
+                        Iconsax.user,
+                        3,
+                        null,
+                        isDark,
+                      ),
+                    ],
+                  );
+                },
+              ),
             ),
           ),
         ),

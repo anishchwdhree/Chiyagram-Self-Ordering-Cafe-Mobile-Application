@@ -1,9 +1,10 @@
+import 'package:chiyagaram/screens/widget/background_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:iconsax/iconsax.dart';
 import 'package:chiyagaram/responsive/size_config.dart';
 import 'package:chiyagaram/theme/app_colors.dart';
 import 'package:chiyagaram/theme/theme_provider.dart';
+import 'package:iconsax/iconsax.dart';
 import 'package:provider/provider.dart';
 
 class HelpSupportScreen extends StatelessWidget {
@@ -15,7 +16,7 @@ class HelpSupportScreen extends StatelessWidget {
     final isDark = themeProvider.isDarkMode;
     final textColor = isDark ? Colors.white : const Color(0xFF3E2723);
 
-    return Scaffold(
+    return BackgroundScaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -34,102 +35,76 @@ class HelpSupportScreen extends StatelessWidget {
         ),
         centerTitle: true,
       ),
-      body: Stack(
-        children: [
-          // Background Gradient
-          RepaintBoundary(
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: isDark
-                      ? [
-                          AppColors.igBlack,
-                          AppColors.igDarkGrey,
-                          AppColors.igBlack,
-                        ]
-                      : [
-                          const Color(0xFFFFF3E0),
-                          const Color(0xFFFFECB3),
-                          const Color(0xFFFBE9E7),
-                        ],
-                ),
-              ),
-              child: const SizedBox.expand(),
+      body: SingleChildScrollView(
+        padding: EdgeInsets.symmetric(horizontal: 20.w).copyWith(
+          top: MediaQuery.of(context).padding.top + kToolbarHeight + 20.h,
+          bottom: 20.h,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildSectionTitle("Frequently Asked Questions", textColor),
+            SizedBox(height: 16.h),
+            _buildFAQItem(
+              "How do I track my order?",
+              "You can track your order status in real-time from the 'My Orders' section in your profile.",
+              isDark,
+              textColor,
             ),
-          ),
-          SafeArea(
-            child: SingleChildScrollView(
-              padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildSectionTitle("Frequently Asked Questions", textColor),
-                  SizedBox(height: 16.h),
-                  _buildFAQItem(
-                    "How do I track my order?",
-                    "You can track your order status in real-time from the 'My Orders' section in your profile.",
-                    isDark,
-                    textColor,
-                  ),
-                  _buildFAQItem(
-                    "How does the self-ordering work?",
-                    "Simply browse the menu, add items to your cart, and place your order. You'll be notified when your order is ready.",
-                    isDark,
-                    textColor,
-                  ),
-                  _buildFAQItem(
-                    "What payment methods do you accept?",
-                    "We accept credit/debit cards, digital wallets, and cash payments at the counter.",
-                    isDark,
-                    textColor,
-                  ),
-                  _buildFAQItem(
-                    "How do I contact customer support?",
-                    "You can reach us via email at support@chiyagram.com or call us directly using the contact options below.",
-                    isDark,
-                    textColor,
-                  ),
-                  SizedBox(height: 32.h),
-                  _buildSectionTitle("Contact Us", textColor),
-                  SizedBox(height: 16.h),
-                  _buildContactCard(
-                    icon: Iconsax.sms,
-                    title: "Email Support",
-                    subtitle: "support@chiyagram.com",
-                    isDark: isDark,
-                    textColor: textColor,
-                    onTap: () {
-                      // Implement email launch
-                    },
-                  ),
-                  SizedBox(height: 16.h),
-                  _buildContactCard(
-                    icon: Iconsax.call,
-                    title: "Phone Support",
-                    subtitle: "+977 9800000000",
-                    isDark: isDark,
-                    textColor: textColor,
-                    onTap: () {
-                      // Implement phone launch
-                    },
-                  ),
-                  SizedBox(height: 16.h),
-                  _buildContactCard(
-                    icon: Iconsax.location,
-                    title: "Visit Us",
-                    subtitle: "Kathmandu, Nepal",
-                    isDark: isDark,
-                    textColor: textColor,
-                    onTap: () {},
-                  ),
-                  SizedBox(height: 32.h),
-                ],
-              ),
+            _buildFAQItem(
+              "How does the self-ordering work?",
+              "Simply browse the menu, add items to your cart, and place your order. You'll be notified when your order is ready.",
+              isDark,
+              textColor,
             ),
-          ),
-        ],
+            _buildFAQItem(
+              "What payment methods do you accept?",
+              "We accept credit/debit cards, digital wallets, and cash payments at the counter.",
+              isDark,
+              textColor,
+            ),
+            _buildFAQItem(
+              "How do I contact customer support?",
+              "You can reach us via email at support@chiyaki.com or call us directly using the contact options below.",
+              isDark,
+              textColor,
+            ),
+            SizedBox(height: 32.h),
+            _buildSectionTitle("Contact Us", textColor),
+            SizedBox(height: 16.h),
+            _buildContactCard(
+              icon: Iconsax.sms,
+              title: "Email Support",
+              subtitle: "support@chiyaki.com",
+              isDark: isDark,
+              textColor: textColor,
+              onTap: () {
+                // Implement email launch
+              },
+            ),
+            SizedBox(height: 16.h),
+            _buildContactCard(
+              icon: Iconsax.call,
+              title: "Phone Support",
+              subtitle: "+977 9800000000",
+              isDark: isDark,
+              textColor: textColor,
+              onTap: () {
+                // Implement phone launch
+              },
+            ),
+            SizedBox(height: 16.h),
+            _buildContactCard(
+              icon: Iconsax.location,
+              title: "Visit Us",
+              subtitle: "Kathmandu, Nepal",
+              isDark: isDark,
+              textColor: textColor,
+              onTap: () {},
+            ),
+            SizedBox(height: 32.h),
+          ],
+        ),
       ),
     );
   }

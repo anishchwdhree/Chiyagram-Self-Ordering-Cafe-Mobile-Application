@@ -1,21 +1,33 @@
-import 'package:chiyagaram/screens/onboarding_screen.dart';
+import 'package:chiyagaram/screens/auth/auth_wrapper.dart';
+import 'package:chiyagaram/services/notification_service.dart';
+import 'package:chiyagaram/services/notification_provider.dart';
+import 'package:chiyagaram/services/connectivity_provider.dart';
+import 'package:chiyagaram/screens/no_internet_screen.dart';
 import 'package:chiyagaram/theme/app_theme.dart';
 import 'package:chiyagaram/theme/theme_provider.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:provider/provider.dart';
 import 'package:chiyagaram/models/cart_model.dart';
+import 'package:chiyagaram/services/navigation_provider.dart';
 
-void main() {
-  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
-  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Ensure Firebase is initialized before calling other Firebase services
+  await Firebase.initializeApp();
+  await NotificationService().init();
+
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => CartModel()),
         ChangeNotifierProvider(create: (context) => ThemeProvider()),
+        ChangeNotifierProvider(create: (context) => NotificationProvider()),
+        ChangeNotifierProvider(create: (context) => ConnectivityProvider()),
+        ChangeNotifierProvider(create: (context) => NavigationProvider()),
       ],
       child: const MyApp(),
     ),
@@ -44,13 +56,26 @@ class MyApp extends StatelessWidget {
           ),
         );
 
-        return MaterialApp(
-          debugShowCheckedModeBanner: false,
-          title: 'ChiyaGharam',
-          theme: AppTheme.lightTheme,
-          darkTheme: AppTheme.darkTheme,
-          themeMode: themeProvider.themeMode,
-          home: const OnboardingScreen(),
+        return Consumer<ConnectivityProvider>(
+          builder: (context, connectivityProvider, child) {
+            return MaterialApp(
+              debugShowCheckedModeBanner: false,
+              title: 'Chiya Ki Tapari',
+              theme: AppTheme.lightTheme,
+              darkTheme: AppTheme.darkTheme,
+              themeMode: themeProvider.themeMode,
+              home: const AuthWrapper(),
+              builder: (context, child) {
+                return Stack(
+                  children: [
+                    if (child != null) child,
+                    if (!connectivityProvider.isOnline)
+                      const NoInternetScreen(),
+                  ],
+                );
+              },
+            );
+          },
         );
       },
     );

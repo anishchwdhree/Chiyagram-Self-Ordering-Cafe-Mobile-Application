@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:chiyagaram/animations/fade_animation.dart';
 import 'package:chiyagaram/responsive/size_config.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
@@ -34,37 +35,33 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         : const Color(0xFF795548).withValues(alpha: 0.5);
 
     return BackgroundScaffold(
-      body: SafeArea(
-        child: SizedBox(
-          height: MediaQuery.of(context).size.height,
-          width: MediaQuery.of(context).size.width,
-          child: Column(
-            children: [
-              Expanded(
-                child: SingleChildScrollView(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 24.w,
-                    vertical: 24.h,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      IconButton(
-                        onPressed: () => Navigator.pop(context),
-                        icon: Icon(Icons.arrow_back_ios, color: textColor),
-                      ),
-                      SizedBox(height: 20.h),
-                      _buildHeader(textColor, subTextColor),
-                      SizedBox(height: 40.h),
-                      _buildForm(isDark, textColor),
-                      SizedBox(height: 40.h),
-                      _buildSendButton(isDark),
-                    ],
-                  ),
+      body: SizedBox(
+        height: MediaQuery.of(context).size.height,
+        width: MediaQuery.of(context).size.width,
+        child: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 24.h),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(height: MediaQuery.of(context).padding.top),
+                    IconButton(
+                      onPressed: () => Navigator.pop(context),
+                      icon: Icon(Icons.arrow_back_ios, color: textColor),
+                    ),
+                    SizedBox(height: 10.h),
+                    _buildHeader(textColor, subTextColor),
+                    SizedBox(height: 40.h),
+                    _buildForm(isDark, textColor),
+                    SizedBox(height: 40.h),
+                    _buildSendButton(isDark),
+                  ],
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -104,7 +101,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       child: _CustomTextField(
         controller: _emailController,
         label: "Email ID",
-        hint: "Enter your email",
         icon: Icons.email_outlined,
         isDark: isDark,
         textColor: textColor,
@@ -119,11 +115,23 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         width: double.infinity,
         height: 45.h,
         child: ElevatedButton(
-          onPressed: () {
+          onPressed: () async {
+            if (_emailController.text.isEmpty) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Please enter your email')),
+              );
+              return;
+            }
+
             setState(() {
               _isLoading = true;
             });
-            Future.delayed(const Duration(seconds: 2), () {
+
+            try {
+              await FirebaseAuth.instance.sendPasswordResetEmail(
+                email: _emailController.text.trim(),
+              );
+
               if (mounted) {
                 setState(() {
                   _isLoading = false;
@@ -141,7 +149,39 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 );
                 Navigator.pop(context);
               }
-            });
+            } on FirebaseAuthException catch (e) {
+              if (mounted) {
+                setState(() {
+                  _isLoading = false;
+                });
+                String message = 'An error occurred';
+                if (e.code == 'user-not-found') {
+                  message = 'No account found with this email.';
+                } else if (e.code == 'invalid-email') {
+                  message = 'Please enter a valid email address.';
+                } else if (e.code == 'network-request-failed') {
+                  message = 'Network error. Please check your connection.';
+                } else {
+                  message = e.message ?? message;
+                }
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(message),
+                    backgroundColor: Colors.redAccent,
+                    behavior: SnackBarBehavior.floating,
+                  ),
+                );
+              }
+            } catch (e) {
+              if (mounted) {
+                setState(() {
+                  _isLoading = false;
+                });
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(SnackBar(content: Text(e.toString())));
+              }
+            }
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: isDark
@@ -174,7 +214,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
 class _CustomTextField extends StatelessWidget {
   final String label;
-  final String hint;
   final IconData icon;
   final TextEditingController controller;
   final bool isDark;
@@ -182,7 +221,6 @@ class _CustomTextField extends StatelessWidget {
 
   const _CustomTextField({
     required this.label,
-    required this.hint,
     required this.icon,
     required this.controller,
     required this.isDark,
@@ -223,7 +261,6 @@ class _CustomTextField extends StatelessWidget {
               color: isDark ? Colors.white : Colors.black87,
             ),
             decoration: InputDecoration(
-              hintText: hint,
               hintStyle: GoogleFonts.inter(
                 color: isDark ? Colors.white38 : Colors.black38,
               ),
