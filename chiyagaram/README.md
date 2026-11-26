@@ -1,57 +1,68 @@
-# 🍵 Chiyagram (Chiya Ki Tapari)
+# 🍵 Chiyagram — Self-Ordering System Mobile Application
 
 [![Flutter](https://img.shields.io/badge/Flutter-v3.10%2B-02569B?logo=flutter&logoColor=white)](https://flutter.dev)
 [![Dart](https://img.shields.io/badge/Dart-3.x-0175C2?logo=dart&logoColor=white)](https://dart.dev)
 [![Firebase](https://img.shields.io/badge/Firebase-Auth%20%7C%20Firestore%20%7C%20Storage-FFCA28?logo=firebase&logoColor=black)](https://firebase.google.com/)
 [![State Management](https://img.shields.io/badge/State-Provider-blue)](https://pub.dev/packages/provider)
 [![Platform](https://img.shields.io/badge/Platform-Android%20%7C%20iOS%20%7C%20Web-success)](https://flutter.dev)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-> **Chiyagram** (inspired by *Chiya Ki Tapari*) is an artisanal tea cafe and lounge ordering mobile application built with Flutter. It brings authentic tea culture, specialty snacks, hookah lounge menus, multi-location discovery, and real-time ordering into an elegant, reactive mobile experience powered by Firebase.
+> **Chiyagram** is a digital **Self-Ordering System Mobile Application** designed for modern cafes, artisanal tea houses, and hospitality lounges. Built with Flutter and backed by Firebase, Chiyagram streamlines table-side customer ordering: customers can browse categorized menus, customize their orders (traditional teas, snacks, hookah flavors), manage a real-time reactive cart, and complete orders directly from their devices—eliminating long wait times and paper order errors.
 
 ---
 
-## ✨ Features
+## 🌟 Self-Ordering System Highlights
 
-### ☕ 1. Curated Artisanal Menu
-- **Traditional Chiya & Teas:** Matka Chiya, Masala Chiya, Special Herbal Blends, Green Tea, and cold brews with detailed flavor profiles and customization.
-- **Specialty Snacks & Bites:** Fresh cafe snacks, momos, bakery items, and comboboxes.
-- **Hookah Lounge Menu:** Specialty hookah flavors, charcoal selections, and lounge combos.
-- **Interactive Carousel & Categories:** Hero banners, trending items, and personalized recommendations.
+- 📱 **Contactless Self-Service Ordering:** Customers browse interactive menus and place orders right from their table or on-the-go.
+- ⚡ **Streamlined Cafe Operations:** Cuts down waiter dependency, speeds up order-to-kitchen turnaround, and prevents order mix-ups.
+- 🛒 **Reactive Smart Cart (`CartModel`):** Dynamic item count, price calculations, and subtotal summary updated instantaneously.
+- ☕ **Artisanal Tea & Specialty Lounge Menus:** Dedicated categories for Traditional Matka Chiya, Herbal Teas, Fresh Cafe Snacks, and Hookah blends.
+- 🔔 **Instant Order & Promotion Notifications:** Local system notifications and an in-app alert center powered by `flutter_local_notifications`.
+- 📍 **Multi-Branch Cafe Locator:** Find nearby cafe branches, operating hours, addresses, and contact info.
+- 🌐 **Offline Resilience:** Continuous connectivity tracking (`connectivity_plus`) with an automatic, graceful "No Internet" status screen.
+- 🎨 **Adaptive Themes:** Light & Dark mode support with smooth transitions, staggered list animations, and Lottie vector effects.
 
-### 📍 2. Cafe Branch & Location Finder
-- Discover nearby cafe branches with addresses, opening hours, contact details, and directions.
+---
 
-### 🛒 3. Cart & Streamlined Checkout
-- **Reactive Shopping Cart:** Increment, decrement, and remove items with real-time subtotal and tax calculation.
-- **Smooth Checkout Flow:** Delivery/dine-in selection, order summary review, and order confirmation.
+## ✨ Full Feature Overview
 
-### 🔐 4. Secure Authentication & Profile
+### ☕ 1. Curated Digital Menus & Categories
+- **Traditional Chiya & Beverages:** Matka Chiya, Masala Chiya, Herbal Teas, Green Tea, and cold brews with detailed flavor descriptions.
+- **Snacks & Dining:** Cafe favorites, momos, bakery items, and dining combos.
+- **Hookah Lounge Catalog:** Flavor varieties, charcoal options, and lounge specials.
+- **Hero Carousel & Discovery:** Featured promotional banners, popular picks, and recommendations.
+
+### 📍 2. Multi-Branch Cafe Finder
+- Multi-location directory showing branch addresses, open/close status, phone numbers, and navigation directions.
+
+### 🛒 3. Cart & Checkout Engine
+- Real-time cart state management with live item increments/decrements.
+- Order review screen displaying breakdown, delivery/dine-in choices, and checkout submission.
+
+### 🔐 4. Authentication & User Profile
 - **Firebase Authentication:**
-  - Email & Password registration and login.
-  - Interactive **Password Strength Meter** with real-time security validation (length, cases, numbers, symbols).
-  - Password reset via email (`sendPasswordResetEmail`).
+  - Secure Email & Password sign-up and sign-in.
+  - Interactive **Password Strength Meter** evaluating length, casing, numbers, and symbols.
+  - Instant password reset via email link.
   - One-tap **Google Sign-In** integration.
-- **User Profile Management:**
-  - Edit personal details and upload profile photos directly to Firebase Storage.
-  - My Orders history and past receipts tracking.
-  - In-app feedback submission, terms of service, and privacy policy views.
-  - Account settings with secure password updates and account deletion.
+- **Account & Profile Center:**
+  - Edit profile information with profile photo upload to Firebase Storage.
+  - "My Orders" transaction history and past receipt records.
+  - Feedback submission, terms of service, and privacy policy views.
+  - Change password workflow and full account deletion.
 
-### 🔔 5. Notifications & Offline Monitoring
-- **Local Notifications:** Instant alerts for order status, special offers, and cafe announcements using `flutter_local_notifications`.
-- **Network Resilience:** Real-time connectivity monitor (`connectivity_plus`) with an automatic, graceful **No Internet** screen when offline.
+### 🔔 5. Notifications & Network Handling
+- Local push-style notifications for order confirmation and offers.
+- Seamless network loss recovery using `ConnectivityProvider`.
 
-### 🎨 6. Modern UI & Theming
-- **Dynamic Light & Dark Themes:** Smooth theme toggle backed by `ThemeProvider` and custom `AppColors`.
-- **Edge-to-Edge Design:** Adaptive system navigation and status bar styling.
-- **Engaging Motion:** Staggered list animations, smooth hero transitions, and Lottie animations.
+### 🎨 6. UI/UX & Theming
+- Native dark mode and light mode toggle backed by `ThemeProvider`.
+- Edge-to-edge transparent system bars and responsive screen sizing.
 
 ---
 
 ## 🏗️ Architecture & State Management
 
-The application is structured following clean architecture principles using the **Provider** pattern:
+The application is built using the **Provider** pattern for predictable, reactive state:
 
 ```text
 chiyagram/
@@ -85,11 +96,11 @@ chiyagram/
 └── README.md
 ```
 
-### State Providers
-- **`CartModel`**: Manages shopping cart state, line items, and running total.
-- **`ThemeProvider`**: Manages light/dark mode preference and system brightness synchronization.
-- **`ConnectivityProvider`**: Monitors network reachability (WiFi / Cellular / Disconnected).
-- **`NotificationProvider`**: In-app notifications list and badge count.
+### Core Providers
+- **`CartModel`**: Reactive shopping cart state, total sum, and quantity controls.
+- **`ThemeProvider`**: Manages light/dark mode preference and system brightness sync.
+- **`ConnectivityProvider`**: Monitors network reachability (WiFi / Mobile / Offline).
+- **`NotificationProvider`**: In-app notifications list and unread badge count.
 - **`NavigationProvider`**: Bottom navigation tab state and routing.
 
 ---
@@ -102,14 +113,14 @@ Ensure you have installed:
 - [Flutter SDK](https://flutter.dev/docs/get-started/install) (v3.10.3 or higher)
 - [Dart SDK](https://dart.dev/get-dart)
 - [Android Studio](https://developer.android.com/studio) or [VS Code](https://code.visualstudio.com/) with Flutter plugins
-- A [Firebase](https://firebase.google.com/) account to configure backend services
+- A [Firebase](https://firebase.google.com/) project configured for Android / iOS
 
 ### Installation & Setup
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/anishchwdhree/Chiyagram.git
-   cd Chiyagram/chiyagaram
+   git clone https://github.com/anishchwdhree/Chiyagram-Mobile-Application.git
+   cd Chiyagram-Mobile-Application/chiyagaram
    ```
 
 2. **Install Flutter packages:**
@@ -118,40 +129,37 @@ Ensure you have installed:
    ```
 
 3. **Configure Firebase:**
-   - Create a new project in the [Firebase Console](https://console.firebase.google.com/).
-   - Add an **Android app** with package name `com.example.chiyagaram` (or your custom package name).
+   - Create a project in the [Firebase Console](https://console.firebase.google.com/).
+   - Add an Android app with package name `com.example.chiyagaram`.
    - Download `google-services.json` and place it in:
      ```text
      chiyagaram/android/app/google-services.json
      ```
      *(A reference template is available at `chiyagaram/android/app/google-services.json.example`)*
-   - Enable **Authentication** (Email/Password and Google Sign-In) in the Firebase console.
-   - Enable **Cloud Firestore** and **Firebase Storage**.
+   - Enable **Authentication** (Email/Password & Google Sign-In), **Firestore**, and **Storage**.
 
 4. **Run the application:**
    ```bash
-   # Run on connected Android device or emulator
+   # Run on connected device or emulator
    flutter run
 
-   # Or specify target platform
+   # Or target desktop/web
    flutter run -d chrome
    flutter run -d windows
    ```
 
-5. **Build release APK / App Bundle:**
+5. **Build release executable / APK:**
    ```bash
    flutter build apk --release
-   # or
-   flutter build appbundle --release
    ```
 
 ---
 
-## 🔒 Security & Best Practices
+## 🔒 Security & Privacy
 
 - **Zero Secret Commits:** `google-services.json`, `GoogleService-Info.plist`, API keys, `.env` files, and local keystores (`*.jks`, `*.keystore`, `key.properties`) are strictly ignored via `.gitignore`.
 - **Firebase Security Rules:** Firestore and Cloud Storage enforce authenticated read/write access policies.
-- **Safe Environment Variables:** Example configuration templates are provided for team setup without leaking production secrets.
+- **Safe Environment Variables:** Configuration templates are provided for team setup without leaking production secrets.
 
 ---
 
@@ -175,9 +183,3 @@ Ensure you have installed:
 
 Developed by **[Anish Chaudhary](https://github.com/anishchwdhree)**  
 GitHub: [@anishchwdhree](https://github.com/anishchwdhree)
-
----
-
-## 📄 License
-
-This project is open-source and available under the [MIT License](LICENSE).
