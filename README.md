@@ -119,8 +119,8 @@ Ensure you have installed:
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/anishchwdhree/Chiyagram-Mobile-Application.git
-   cd Chiyagram-Mobile-Application/chiyagaram
+   git clone https://github.com/anishchwdhree/Chiyagram-Self-Ordering-Cafe-Mobile-Application.git
+   cd Chiyagram-Self-Ordering-Cafe-Mobile-Application/chiyagaram
    ```
 
 2. **Install Flutter packages:**
