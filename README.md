@@ -1,4 +1,4 @@
-# 🍵 Chiyagram (Chiya Ki Tapari)
+# 🍵 Chiyagram 
 
 [![Flutter](https://img.shields.io/badge/Flutter-v3.10%2B-02569B?logo=flutter&logoColor=white)](https://flutter.dev)
 [![Dart](https://img.shields.io/badge/Dart-3.x-0175C2?logo=dart&logoColor=white)](https://dart.dev)
