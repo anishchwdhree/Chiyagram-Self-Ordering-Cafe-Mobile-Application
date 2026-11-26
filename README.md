@@ -175,9 +175,3 @@ Ensure you have installed:
 
 Developed by **[Anish Chaudhary](https://github.com/anishchwdhree)**  
 GitHub: [@anishchwdhree](https://github.com/anishchwdhree)
-
----
-
-## 📄 License
-
-This project is open-source and available under the [MIT License](LICENSE).
